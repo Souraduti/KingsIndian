@@ -1,0 +1,117 @@
+#ifndef SEARCH
+#define SEARCH
+
+#include "board.c"
+#include "move.c"
+#include "piece_movement.c"
+#include "static_evaluation.c"
+
+#define MAXDEPTH 4
+#define INF 500000
+
+/*gives a random legal move*/
+Move random_move(Board * board,int turn){
+    Movelist movelist;
+    genarate_all(board,&movelist,turn,1);
+    int i = rand()%(movelist.size);
+    return movelist.list[i];
+}
+/*
+    evaluate function uses minimax algorithm with alpha-beta pruning
+*/
+/*
+    the pointer to a varible is passed to successive recursive call
+    if the last moved played was illegal (puts the king in danger)
+    the value pointed is set to 0 so that higher level this is used to 
+    check for Chekmate and Stalemate
+
+    there is added bonus for chekmate corrosponding the depth
+    to encourage it to choose fastest mate 
+
+*/
+int evaluate(Board * board,int turn,int depth,int* legal,int alpha,int beta){
+    if(depth==0){
+        return static_eval(board);
+    }
+    int i,eval,best_eval,count=0;
+    Movelist all_moves;
+    best_eval = (-1)*turn*(INF+(MAXDEPTH+1)*1000);
+    genarate_all(board,&all_moves,turn,0);
+    for(i=0;i<all_moves.size;i++){
+        if(get_captured_piece(&all_moves.list[i])==-6*turn){
+            best_eval = turn*INF;
+            *legal = 0;
+            return best_eval;
+        }
+        int l = 1;
+        move_on_board(board,&all_moves.list[i]);
+        eval = evaluate(board,-turn,depth-1,&l,alpha,beta);
+        unmove_on_board(board,&all_moves.list[i]);
+        if(l==0){
+            //the move was illegal
+            continue;
+        }
+        if(turn==1){
+            if(best_eval<eval) best_eval = eval;
+            if(alpha<eval) alpha = eval; 
+        }else{
+            if(best_eval>eval) best_eval = eval;
+            if(beta>eval) beta = eval;
+        }
+        count++;
+        if(beta<=alpha) break;
+    }
+    if(count==0){
+        if(in_check(board,turn)==0){
+            //stalemate
+            return 0;
+        }else{
+            //checkmate
+            return (-1)*turn*(INF+depth*1000);
+        }
+    }
+    return best_eval;
+}
+Move computer_move(Board * board,const int turn){
+    Move move;
+    if(is_checkmate(board,turn)==1){
+        move.mv = -1;
+        return move;
+    }else if(is_stalemate(board,turn)==1){
+        move.mv = 0;
+        return move;
+    }
+    Movelist all_moves;
+    int i,eval,e;
+    if(turn==1){
+        /*for White lowest possible value of eval */
+        eval = -INF;
+    }else{
+        /*for Black highest possible value of eval */
+        eval = INF;
+    }
+    int legal=1;
+    genarate_all(board,&all_moves,turn,1);
+    move = all_moves.list[0];
+    for(i=0;i<all_moves.size;i++){
+        move_on_board(board,&all_moves.list[i]);
+        e = evaluate(board,-turn,MAXDEPTH,&legal,-INF,INF);
+        unmove_on_board(board,&all_moves.list[i]);
+        if(turn==1){
+            /*White finds the maximum evaluation*/
+            if(e>eval){
+                eval = e;
+                move = all_moves.list[i];
+            }
+        }else{
+            /*Black finds the minimum evaluation*/
+            if(e<eval){
+                eval = e;
+                move = all_moves.list[i];
+            }
+        }
+    }
+    return move;
+}
+
+#endif
