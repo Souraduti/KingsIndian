@@ -38,14 +38,6 @@ Move user_input(Board * board, int turn){
     fflush(stdin);
     scanf("%c",&p);
     if(p=='0') exit(1);
-    /*if(p=='x'){
-        Movelist moves;
-        genarate_all(board,&moves,-turn,1);
-        for(int i =0;i<moves.size;i++){
-            display_move(&moves.list[i]);
-        }
-        return user_move;
-    }*/
     for(i=0;i<=6;i++){
         if(i==6){
             printf("Please Enter a valid Piece\n");
@@ -88,11 +80,6 @@ Move user_input(Board * board, int turn){
 
     if((p=='P'||p=='p')&&((src-dest)%8!=0)&&board->brd[dest]==0){
         //En-passant
-        /*Movelist movelist;
-        genarate_all(board,&movelist,-1,0);
-        for(int i=0;i<movelist.size;i++){
-            display_move(&movelist.list[i]);
-        }*/
         user_move.mv|=(1<<28);
     }
     if((p=='P'&&to[1]=='8')||(p=='p'&&to[1]=='1')){
@@ -114,9 +101,6 @@ Move user_input(Board * board, int turn){
     set_destination(&user_move,dest);
     set_captured_piece(&user_move,board->brd[dest]);
 
-    /* genrate all possible legal moves in the position
-       compares if user_move is present in movelist
-    */
     genarate_all(board,&movelist,turn,1);
     for(i=0;i<=movelist.size;i++){
         if(i==movelist.size){
