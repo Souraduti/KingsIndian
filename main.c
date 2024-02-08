@@ -10,13 +10,6 @@
 #include "search.c"
 
 
-/*
-  some problem in en-passant
-  has to implement draw by stalemate in evaluate
-  testing required
-  some times hangs pieces for no reasons
-  have to make it play fastest mate possible;
-*/
 
 /*
     //for time taken by a move
