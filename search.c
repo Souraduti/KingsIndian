@@ -12,7 +12,7 @@
 /*gives a random legal move*/
 Move random_move(Board * board,int turn){
     Movelist movelist;
-    genarate_all(board,&movelist,turn,1);
+    generate_all(board,&movelist,turn,1);
     int i = rand()%(movelist.size);
     return movelist.list[i];
 }
@@ -36,7 +36,7 @@ int evaluate(Board * board,int turn,int depth,int* legal,int alpha,int beta){
     int i,eval,best_eval,count=0;
     Movelist all_moves;
     best_eval = (-1)*turn*(INF+(MAXDEPTH+1)*1000);
-    genarate_all(board,&all_moves,turn,0);
+    generate_all(board,&all_moves,turn,0);
     for(i=0;i<all_moves.size;i++){
         if(get_captured_piece(&all_moves.list[i])==-6*turn){
             best_eval = turn*INF;
@@ -91,7 +91,7 @@ Move computer_move(Board * board,const int turn){
         eval = INF;
     }
     int legal=1;
-    genarate_all(board,&all_moves,turn,1);
+    generate_all(board,&all_moves,turn,1);
     move = all_moves.list[0];
     for(i=0;i<all_moves.size;i++){
         move_on_board(board,&all_moves.list[i]);

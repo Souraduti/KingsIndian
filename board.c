@@ -79,7 +79,8 @@ void set_board(Board * board){
     for(i = 16;i<48;i++){
         board->brd[i] = 0;
     }
-    board->flag = 0b000000000000011100000010011110000;
+    /* 984304 in binary => 000000000000011110000010011110000*/
+    board->flag = 984304;
 }
 
 /* sets an Empty Board */
@@ -117,7 +118,7 @@ int8 get_pcode(char p){
 }
 
 /* Displays the chess board */
-void * display(Board * board){
+void * display(const Board * board){
     int i,j;
     
     printf("\n\n");
@@ -133,7 +134,7 @@ void * display(Board * board){
 }
 
 //63 => 00111111
-int8 get_king_pos(Board * board,int turn){
+int8 get_king_pos(const Board * board,int turn){
     int8 sq;
     int off = (turn==1)?8:14;
     sq = (board->flag>>off)&63;
@@ -144,16 +145,18 @@ void set_king_pos(Board * board,int turn,int8 sq){
     board->flag = ~(~(board->flag)|(63<<off));
     board->flag = board->flag|((sq&63)<<off);
 }
-int get_pawn_jump(Board * board,int turn){
+int get_pawn_jump(const Board * board,int turn){
     int last = board->flag&15;
     if((board->flag&(1<<20))==0) return -1;
-    if(turn==-1&&(last&(1<<3))!=0) return -1;
-    if(turn==1&&(last&(1<<3))==0) return -1;
+    if(turn==0) return last;
+    if(turn==-1&&(last&(1<<3))==0) return -1;
+    if(turn==1&&(last&(1<<3))!=0) return -1;
     return last&7;
 }
 void set_pawn_jump(Board * board,int file,int turn){
     if(file==-1){
         board->flag = ~((~board->flag)|(1<<20));
+        board->flag = ~((~board->flag)|15);
         return;
     }
     if(turn==-1) file+=8;
@@ -161,5 +164,23 @@ void set_pawn_jump(Board * board,int file,int turn){
     board->flag = board->flag&(~15);
     board->flag|= file;
 }
+/*
+    side = 1 for short
+    side = 0 for long
+*/
+int get_castling_right(const Board * board ,int turn,int side){
+    int off = 5+turn+side;
+    if((board->flag&(1<<off))==0) return 0;
+    return 1;
+}
+void set_castling_right(Board * board ,int turn,int side,int v){
+    int off = 5+turn+side;;
+    if(v==0){
+        board->flag = ~(~(board->flag)|(1<<off));
+    }else if(v==1){
+        board->flag|=(1<<off);
+    }
+}
+
 #endif
 

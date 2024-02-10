@@ -3,27 +3,30 @@
 
 #include "board.c"
 
+#define LIST_LENGTH 128
+
 /*
     Move representation : 
     structure of mv
     00000000000 0000  0000   000000 000000
     |  flag |  |capt||piece| |dest| |source|
 
-    flag ->   000   0          00       0000       00
-                               LS       BRNQ       LS
-               En-passant prev-castle promotion  castling
+    flag ->   00000  00  0   0000
+            prev-En  LS  En  BRNQ 
+                               LS
+                  prev-castle promotion&castling
 */
 typedef struct Move{
     int mv;
 }Move;
 
 typedef struct Movelist{
-    Move list[128];
+    Move list[LIST_LENGTH];
     int size;
 }Movelist;
 
 int add_move(Movelist * movelist,Move move){
-    if(movelist->size==100){
+    if(movelist->size==LIST_LENGTH-1){
         return -1;
     }
     movelist->list[movelist->size].mv = move.mv;
@@ -96,6 +99,72 @@ void set_captured_piece(Move * move,int8 piece){
     move->mv = (move->mv)|((piece<<off)&flag);
 }
 
+int get_turn(const Move * move){
+    return ((move->mv&(1<<15))==0)?1:-1;
+}
+int is_castling(const Move * move,int side){
+    int off = 1-side+20;
+    return ((move->mv&(1<<off))==0)?0:1;
+}
+void set_castling(Move * move,int side){
+    int off = 1-side+20;
+    move->mv = move->mv|(1<<off);
+}
+void clear_castling(Move * move,int side){
+    int off = 1-side+20;
+    move->mv = ~(~(move->mv)|(1<<off));
+}
+int get_promotion(Move * move){
+    return (move->mv>>20)&15;
+}
+int clear_promotion(Move * move){
+    move->mv = ~(~(move->mv)|(15<<20));
+}
+void set_promotion(Move * move,int p){
+    if(p!=1&&p!=2&p!=4&p!=8) return;
+    move->mv = ~(~(move->mv)|(15<<20));
+    move->mv|=((p&15)<<20);
+}
+int is_enpassant(const Move * move){
+    return (move->mv&(1<<24))==0?0:1;
+}
+void set_enpassant(Move * move){
+    move->mv|=(1<<24);
+}
+void clear_enpassant(Move * move){
+    move->mv = ~(~(move->mv)|(1<<24));
+}
+void store_board_flag(Move * move,Board * board){
+    int turn = get_turn(move);
+    if(get_castling_right(board,turn,1)==1){
+        //short
+        move->mv|=(1<<25);
+    }
+    if(get_castling_right(board,turn,0)==1){
+        //long
+        move->mv|=(1<<26);
+    }
+    int jump = get_pawn_jump(board,0);
+    if(jump!=-1&&jump<=15){
+        move->mv = move->mv|(jump<<27);
+        move->mv = move->mv|(1<<31);
+    }
+}
+void restore_board_flag(Move * move,Board * board){
+    int turn = get_turn(move);
+    int file = (move->mv>>27)&15;
+    if((move->mv&(1<<31))==0){
+        set_pawn_jump(board,-1,turn);
+    }else{
+        set_pawn_jump(board,file,0);
+    }
+
+    set_castling_right(board,turn,1,(move->mv>>25)&1);
+    set_castling_right(board,turn,0,(move->mv>>26)&1);
+
+    move->mv = move->mv&((1<<25)-1);
+}
+
 void display_move(Move * move){
     
     char p,cpt;
@@ -118,19 +187,6 @@ void display_move(Move * move){
     printf("%c from %s to %s ",p,from,to);
     if(cpt!='.'){
         printf("capturing %c ",cpt);
-    }
-    prom = (move->mv>>22)&15;
-    if(prom!=0){
-        printf(" promoting ");
-        if(prom==1){
-            printf("Queen");
-        }else if(prom==2){
-            printf("Night");
-        }else if(prom==4){
-            printf("Rook");
-        }else if(prom==8){
-            printf("Bishop");
-        }
     }
     printf("\n");
 }

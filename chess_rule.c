@@ -7,13 +7,13 @@
 #include "make_unmake.c"
 
 
-int in_check(Board * board,int turn){
+int in_check(const Board * board,int turn){
     int8 sq = get_king_pos(board,turn);
     return is_opponent_controls(board,sq,turn);
 }
 
 /*
-    checks if the move leavs vulnarable to check
+    checks if the move leaves king vulnarable to check.
     if a psudo-legal move is legal or not
 */
 int is_playable(Board *board,Move * move,int turn){
@@ -26,25 +26,19 @@ int is_playable(Board *board,Move * move,int turn){
     return ch;
 }
 
-int abs(int a){
-    if(a<0) return -a;
-    return a;
-}
-
 int cmp(Move * m1,Move * m2){
-    int8 c1,c2;
-    int8 p1,p2;
-    c1  = abs(get_captured_piece(m1));
-    c2  = abs(get_captured_piece(m2));
+    int8 c1,c2,p1,p2;
+    c1  = get_captured_piece(m1);
+    c2  = get_captured_piece(m2);
+    if(c1<0) c1=-c1;
+    if(c2<0) c2=-c2;
     if(c1>c2) return 1;
     if(c1<c2) return 0;
-    p1 = abs(get_piece(m1));
-    p2 = abs(get_piece(m2));
-    if(p1<=p2) {
-        return 1;
-    }else{
-        return 0;
-    }
+    p1 = get_piece(m1);
+    p2 = get_piece(m2);
+    if(p1<0) p1=-p1;
+    if(p2<0) p2=-p2;
+    return (p1<=p2)?1:0;
 }
 void order_moves(Movelist * movelist){
     int i,j;
@@ -60,8 +54,7 @@ void order_moves(Movelist * movelist){
     }
 }
 
-//filters out illegal moves from legal moves
-//time consuming
+/*filters out illegal moves from pseudo-legal moves*/
 void filter_move(Board *board,Movelist * all_move,int turn){
     int i,last;
     last = all_move->size-1;
@@ -74,7 +67,12 @@ void filter_move(Board *board,Movelist * all_move,int turn){
     }
     all_move->size = last+1;
 }
-Movelist genarate_all(Board *board,Movelist * all_move,int turn,int flag){
+/*
+    generate all possible moves in a position
+    flag = 0 -> all pseudo-legal move
+    flag = 1 -> only legal moves 
+*/
+Movelist generate_all(Board *board,Movelist * all_move,int turn,int flag){
     all_move->size=0;
     int i;
     for(i=0;i<64;i++){
@@ -110,23 +108,25 @@ Movelist genarate_all(Board *board,Movelist * all_move,int turn,int flag){
 int is_checkmate(Board* board,int turn){
     if(in_check(board,turn)==0) return 0;
     Movelist moves;
-    genarate_all(board,&moves,turn,1);
+    generate_all(board,&moves,turn,1);
     return (moves.size==0)?1:0;
 }
 int is_stalemate(Board * board,int turn){
     if(in_check(board,turn)==1) return 0;
     Movelist moves;
-    genarate_all(board,&moves,turn,1);
+    generate_all(board,&moves,turn,1);
     return (moves.size==0)?1:0;
 }
 
 int is_gameover(Board * board,int turn){
     int cheked = in_check(board,turn);
     Movelist moves;
-    genarate_all(board,&moves,turn,1);
+    generate_all(board,&moves,turn,1);
     if(moves.size!=0) return 0;
-    if(cheked==1) return -1; //checkmate
-    return 1; //stalemate
+    //checkmate
+    if(cheked==1) return -1; 
+    //stalemate
+    return 1; 
 }
 
 #endif

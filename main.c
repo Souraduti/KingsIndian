@@ -9,18 +9,9 @@
 #include "chess_rule.c"
 #include "search.c"
 
-
-
-/*
-    //for time taken by a move
-    start = clock();
-    move = computer_move(&board,-1);
-    end = clock();
-    elapsed = (end-start)*1000/CLOCKS_PER_SEC;
-*/
 int main(){
 
-    int choice = 0;
+    int choice = 0,first_move=1;
     time_t t,start,end;
     double elapsed;
     srand((unsigned)time(&t));
@@ -58,7 +49,12 @@ int main(){
             display(&board);
         }else if(choice==2){
             start = clock();
-            move = computer_move(&board,1);
+            if(first_move==1){
+                move = random_move(&board,1);
+                first_move = 0;
+            }else{
+                move = computer_move(&board,1);
+            }
             end = clock();
             elapsed = (end-start)*1000/CLOCKS_PER_SEC;
             move_on_board(&board,&move);
@@ -69,7 +65,6 @@ int main(){
             printf("Time : %0.3lf ms\n",elapsed);
 
         }
-
         //Black move
         if(is_checkmate(&board,-1)==1){
             printf("White Won\n");
@@ -80,8 +75,13 @@ int main(){
         }
         move.mv = 0;
         if(choice==1){
-           start = clock();
-            move = computer_move(&board,-1);
+            start = clock();
+            if(first_move==1){
+                move = random_move(&board,-1);
+                first_move = 0;
+            }else{
+                move = computer_move(&board,-1);
+            }
             end = clock();
             elapsed = (end-start)*1000/CLOCKS_PER_SEC;
             move_on_board(&board,&move);

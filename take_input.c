@@ -25,7 +25,7 @@ Move user_input(Board * board, int turn){
     //0 represents null move
     user_move.mv = 0; 
     if(in_check(board,turn)==1){
-        printf("-----Chechk-----\n");
+        printf("-----Check-----\n");
     }
     if(turn==1){
         printf("White's turn : \n");
@@ -45,23 +45,15 @@ Move user_input(Board * board, int turn){
         }
         if(p==valid_pieces[i]) break;
     }
+    
     printf("from  :");
     fflush(stdin);
     scanf("%s",from);
-    if(from[0]<'a'||from[0]>'h'||from[1]<'0'||from[1]>'8'){
+    if(from[0]<'a'||from[0]>'h'||from[1]<'1'||from[1]>'8'){
         printf("Invalid start square\n");
         return user_move;
     }else{
         src = (from[0]-'a')+(from[1]-'1')*8;
-    }
-    printf("to    :");
-    fflush(stdin);
-    scanf("%s",to);
-    if(to[0]<'a'||to[0]>'h'||to[1]<'0'||to[1]>'8'){
-        printf("Invalid end square\n");
-        return user_move;
-    }else{
-        dest = (to[0]-'a')+(to[1]-'1')*8;
     }
     if(turn==1){
         p = p+'A'-'a';
@@ -70,17 +62,28 @@ Move user_input(Board * board, int turn){
         printf("Piece is not in that square \n");
         return user_move;
     }
+    printf("to    :");
+    fflush(stdin);
+    scanf("%s",to);
+    if(to[0]<'a'||to[0]>'h'||to[1]<'1'||to[1]>'8'){
+        printf("Invalid end square\n");
+        return user_move;
+    }else{
+        dest = (to[0]-'a')+(to[1]-'1')*8;
+    }
+    
     if((p=='K'&&src==4&&dest==6)||(p=='k'&&src==60&&dest==62)){
         //short castle
-        user_move.mv = user_move.mv|(1<<20); 
+        set_castling(&user_move,1);
+        //user_move.mv = user_move.mv|(1<<20); 
     }else if((p=='K'&&src==4&&dest==2)||(p=='k'&&src==60&&dest==58)){
         //long castle
-        user_move.mv = user_move.mv|(1<<21); 
+        set_castling(&user_move,0); 
     }
 
     if((p=='P'||p=='p')&&((src-dest)%8!=0)&&board->brd[dest]==0){
         //En-passant
-        user_move.mv|=(1<<28);
+       set_enpassant(&user_move);
     }
     if((p=='P'&&to[1]=='8')||(p=='p'&&to[1]=='1')){
         int ch = 0;
@@ -93,15 +96,14 @@ Move user_input(Board * board, int turn){
             scanf("%d",&ch);
         }while(ch<=0||ch>4);
         //for setting promotion flag 
-        ch+=21;
-        user_move.mv = user_move.mv|(1<<ch);
+        set_promotion(&user_move,(1<<(ch-1)));
     }
     set_piece(&user_move,get_pcode(p));
     set_source(&user_move,src);
     set_destination(&user_move,dest);
     set_captured_piece(&user_move,board->brd[dest]);
-
-    genarate_all(board,&movelist,turn,1);
+    
+    generate_all(board,&movelist,turn,1);
     for(i=0;i<=movelist.size;i++){
         if(i==movelist.size){
             user_move.mv = 0;

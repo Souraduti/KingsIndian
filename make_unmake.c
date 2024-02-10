@@ -12,78 +12,34 @@ void move_on_board(Board * board,Move* move){
     int8 p = get_piece(move);
     int8 dest = get_destination(move); 
     int8 src = get_source(move);
+    int turn = get_turn(move);
+
     board->brd[dest] = p;
     board->brd[src] = 0;
     
-    if(p==6){
-        set_king_pos(board,1,dest);
-        //updating castling flags for king move
-        if((board->flag&(1<<7))!=0){
-            move->mv|=(1<<26);
-            board->flag = ~((~board->flag)|(1<<7));
-        }
-        if((board->flag&(1<<6))!=0){
-            move->mv|=(1<<27);
-            board->flag = ~((~board->flag)|(1<<6));
-        }     
-    }else if(p==-6){
-        set_king_pos(board,-1,dest);
-        if((board->flag&(1<<5))!=0){
-            move->mv|=(1<<26);
-            board->flag = ~((~board->flag)|(1<<5));
-        }
-        if((board->flag&(1<<4))!=0){
-            move->mv|=(1<<27);
-            board->flag = ~((~board->flag)|(1<<4));
-        }
-    }
-
-    //updating castling flag for rook move
-    if(p==4&&src==7){
-        if((board->flag&(1<<7))!=0){
-            move->mv|=(1<<26);
-            board->flag = ~((~board->flag)|(1<<7));
-        }
-    }else if(p==-4&&src==63){
-        if((board->flag&(1<<5))!=0){
-            move->mv|=(1<<26);
-            board->flag = ~((~board->flag)|(1<<5));
-        }
-    }else if(p==4&&src==0){
-        if((board->flag&(1<<6))!=0){
-            move->mv|=(1<<27);
-            board->flag = ~((~board->flag)|(1<<6));
-        }
-    }else if(p==-4&&src==56){
-        if((board->flag&(1<<4))!=0){
-            move->mv|=(1<<27);
-            board->flag = ~((~board->flag)|(1<<4));
-        }
-    }
+    store_board_flag(move,board);
 
     //castling
-    if((move->mv&(1<<20))!=0){
-        board->brd[dest-1] = p*2/3; //(6*2/3 == 4)
+    if(p==turn*6&&is_castling(move,1)==1){
+        board->brd[dest-1] = 4*turn; 
         board->brd[dest+1] = 0;
-    }else if((move->mv&(1<<21))!=0){
-        board->brd[dest+1] = p*2/3; //(6*2/3 == 4)
+    }else if(p==turn*6&&is_castling(move,0)==1){
+        board->brd[dest+1] = 4*turn; 
         board->brd[dest-2] = 0;
     }
 
-    //cheking for pwan promotion
-    //shifting mv 22 times gives the promotion flags,15 = 1111
-    int prom = (move->mv>>22)&15;
-    if(prom!=0){
-        int sign =(p>0)?1:-1;
+    //promotion
+    int prom = get_promotion(move);
+    if(prom!=0&&p==turn){
         switch(prom){
             //Queen
-            case 1:board->brd[dest] = sign*5;break;
+            case 1:board->brd[dest] = turn*5;break;
             //Knight
-            case 2:board->brd[dest] = sign*2;break;
+            case 2:board->brd[dest] = turn*2;break;
             //Rook
-            case 4:board->brd[dest] = sign*4;break;
+            case 4:board->brd[dest] = turn*4;break;
             //Bishop
-            case 8:board->brd[dest] = sign*3;break;
+            case 8:board->brd[dest] = turn*3;break;
         }
     }
     //updating flags if pwan moves 2 square
@@ -93,98 +49,73 @@ void move_on_board(Board * board,Move* move){
     }else if(p==-1&&(src-dest)==16){
         set_pawn_jump(board,src&7,-1);
     }
+
     //En-passant
-    if((move->mv&(1<<28))!=0&&(p==1||p==-1)){
+    if(is_enpassant(move)==1){
         if((dest-src)==9||(dest-src)==-7){
             board->brd[src+1] = 0;
         }else if((dest-src)==-9||(dest-src)==7){
             board->brd[src-1] = 0;
         } 
     } 
+
+    //updating king position and castling flag
+    if(p==6||p==-6){
+        set_king_pos(board,turn,dest);
+        set_castling_right(board,turn,1,0);
+        set_castling_right(board,turn,0,0);
+    }
+    if((p==4&&src==7)||(p==-4&&src==63)){
+        set_castling_right(board,turn,1,0);
+    }
+    if((p==4&&src==0)||(p==-4&&src==56)){
+        set_castling_right(board,turn,0,0);
+    }
+
 }
 
 /*
     Undo the effects of move_on_board function 
-    except for en-passant flags
 */
 void unmove_on_board(Board * board,Move* move){
     int8 p = get_piece(move);
     int8 dest = get_destination(move); 
     int8 src = get_source(move);
+    int turn = get_turn(move);
 
     board->brd[src] = p;
     board->brd[dest] = get_captured_piece(move);
 
-    if(p==6){
-        set_king_pos(board,1,src);
-        if((board->flag&(1<<7))==0&&(move->mv&(1<<26))!=0){
-            board->flag|=(1<<7);
-            move->mv = ~((~move->mv)|(1<<26));
-        }
-        if((board->flag&(1<<6))==0&&(move->mv&(1<<27))!=0){
-            board->flag|=(1<<6);
-            move->mv = ~((~move->mv)|(1<<27));
-        }
-        
-    }else if(p==-6){
-        set_king_pos(board,-1,src);
-        if((board->flag&(1<<5))==0&&(move->mv&(1<<26))!=0){
-            board->flag|=(1<<5);
-            move->mv = ~((~move->mv)|(1<<26));
-        }
-        if((board->flag&(1<<4))==0&&(move->mv&(1<<27))!=0){
-            board->flag|=(1<<4);
-            move->mv = ~((~move->mv)|(1<<27));
-        }
-    }
-
-    //updating castling flag for rook move
-    if(p==4&&src==7){
-        if((board->flag&(1<<7))==0&&(move->mv&(1<<26))!=0){
-            board->flag|=(1<<7);
-            move->mv = ~((~move->mv)|(1<<26));
-        }
-    }else if(p==-4&&src==63){
-        if((board->flag&(1<<5))==0&&(move->mv&(1<<26))!=0){
-            board->flag|=(1<<5);
-            move->mv = ~((~move->mv)|(1<<26));
-        }
-    }else if(p==4&&src==0){
-        if((board->flag&(1<<6))==0&&(move->mv&(1<<27))!=0){
-            board->flag|=(1<<6);
-            move->mv = ~((~move->mv)|(1<<27));
-        }
-    }else if(p==-4&&src==56){
-        if((board->flag&(1<<4))==0&&(move->mv&(1<<27))!=0){
-            board->flag|=(1<<4);
-            move->mv = ~((~move->mv)|(1<<27));
-        }
-    }
+    restore_board_flag(move,board);
 
     //castling
-    if((move->mv&(1<<20))!=0){
-        board->brd[dest-1] = 0; //(6*2/3 == 4)
-        board->brd[dest+1] = p*2/3;
-    }else if((move->mv&(1<<21))!=0){
-        board->brd[dest-2] = p*2/3; //(6*2/3 == 4)
+    if(p==6*turn&&is_castling(move,1)==1){
+        board->brd[dest-1] = 0; 
+        board->brd[dest+1] = 4*turn;
+    }else if(p==6*turn&&is_castling(move,0)==1){
+        board->brd[dest-2] = 4*turn;
         board->brd[dest+1] = 0;
     }
-    //cheking for pwan promotion
-    //shifting mv 22 times gives the promotion flags,15 = 1111
-    int prom = (move->mv>>22)&15;
-    if(prom!=0){
-        int sign =(p>0)?1:-1;
-        board->brd[src] = sign;
+
+    //promotion
+    int prom = get_promotion(move);
+    if(prom!=0&&p==turn){
+        board->brd[src] = turn;
     }
 
     //En-passant
-    if((move->mv&(1<<28))!=0){
+    if(is_enpassant(move)==1){
         if((dest-src)==9||(dest-src)==-7){
             board->brd[src+1] = -p;
         }else if((dest-src)==-9||(dest-src)==7){
             board->brd[src-1] = -p;
         } 
-    } 
+    }
+    //updating king position
+    if(p==6*turn){
+        set_king_pos(board,turn,src);
+    }
+
 }
 
 #endif
