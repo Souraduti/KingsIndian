@@ -35,7 +35,7 @@ int evaluate(Board * board,int turn,int depth,int* legal,int alpha,int beta){
     }
     int i,eval,best_eval,count=0;
     Movelist all_moves;
-    best_eval = (-1)*turn*(INF+(MAXDEPTH+1)*1000);
+    best_eval = (-1)*turn*INF;
     generate_all(board,&all_moves,turn,0);
     for(i=0;i<all_moves.size;i++){
         if(get_captured_piece(&all_moves.list[i])==-6*turn){
@@ -67,7 +67,7 @@ int evaluate(Board * board,int turn,int depth,int* legal,int alpha,int beta){
             return 0;
         }else{
             //checkmate
-            return (-1)*turn*(INF+depth*1000);
+            return (-1)*turn*(INF-(MAXDEPTH+1-depth)*1000);
         }
     }
     return best_eval;
@@ -90,12 +90,19 @@ Move computer_move(Board * board,const int turn){
         /*for Black highest possible value of eval */
         eval = INF;
     }
-    int legal=1;
+    int legal=1,total = piece_count(board),depth = MAXDEPTH;
+    if(total<500){
+    	depth = 8;
+	}else if(total<800){
+		depth = 7;
+	}else if(total<1200){
+		depth = 6;
+	}
     generate_all(board,&all_moves,turn,1);
     move = all_moves.list[0];
     for(i=0;i<all_moves.size;i++){
         move_on_board(board,&all_moves.list[i]);
-        e = evaluate(board,-turn,MAXDEPTH,&legal,-INF,INF);
+        e = evaluate(board,-turn,depth,&legal,-INF,INF);
         unmove_on_board(board,&all_moves.list[i]);
         if(turn==1){
             /*White finds the maximum evaluation*/

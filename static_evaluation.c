@@ -21,7 +21,7 @@ int _king_endgame[8][8]
     = {
         {-30,-10,-10,-10,-10,-10,-10,-30},
         {-10, 20, 30, 30, 30, 30, 20,-10},
-        {-10, 20, 40, 50, 50, 40, 20,-10},
+        {-10, 40, 60, 60, 60, 60, 40,-10},
         {-10, 20, 40, 50, 50, 40, 20,-10},
         {-10, 20, 40, 40, 40, 40, 20,-10},
         {-10, 20, 20, 20, 20, 20, 20,-10},
@@ -102,18 +102,29 @@ int get_piece_value(int8 p_code){
 }
 //if there is queens on the board it is not considered endgame
 int is_endgame(const Board * board){
+    int i,e = 0,q_flag = 0;
+    for(i=0;i<64;i++){
+        int p = board->brd[i];
+        if(p<0) p=-p;
+        if(p==6) continue;
+        if(p==5) q_flag = 1;
+        e+= get_piece_value(p);
+    }
+    if(q_flag==0&&e<3000) return 1;
+    if(q_flag==1&&e<1600) return 1;
+    return 0;
+}
+
+int piece_count(const Board * board){
     int i,e = 0;
     for(i=0;i<64;i++){
         int p = board->brd[i];
         if(p<0) p=-p;
         if(p==6) continue;
-        if(p==5) return 0;
         e+= get_piece_value(p);
     }
-    if(e<2500) return 1;
-    return 0;
+    return e;
 }
-
 int activity(const Board * board,int endgame){
     int i,r,c,eval = 0;
     for(i=0;i<64;i++){

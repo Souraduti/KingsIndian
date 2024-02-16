@@ -11,9 +11,9 @@
 
 int main(){
 
-    int choice = 0,first_move=1;
+    int choice = 0,first_move=1,count=0;
     time_t t,start,end;
-    double elapsed;
+    double elapsed,total=0;
     srand((unsigned)time(&t));
     Board board;
     Move move;
@@ -57,6 +57,7 @@ int main(){
             }
             end = clock();
             elapsed = (end-start)*1000/CLOCKS_PER_SEC;
+            total+=elapsed;
             move_on_board(&board,&move);
             system("cls");
             display(&board);
@@ -84,6 +85,7 @@ int main(){
             }
             end = clock();
             elapsed = (end-start)*1000/CLOCKS_PER_SEC;
+            total+=elapsed;
             move_on_board(&board,&move);
             system("cls");
             display(&board);
@@ -97,8 +99,11 @@ int main(){
             move_on_board(&board,&move);
             system("cls");
             display(&board);
-        }    
+        } 
+		count++;   
     }
+    
     display(&board);
+    printf("Avarage time spend by Computer  : %lf\n",total/count);
     return 0;
 }
