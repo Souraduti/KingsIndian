@@ -12,7 +12,7 @@ void move_on_board(Board * board,Move* move){
     int8 p = get_piece(move);
     int8 dest = get_destination(move); 
     int8 src = get_source(move);
-    int turn = get_turn(move);
+    Turn turn = get_turn(move);
 
     board->brd[dest] = p;
     board->brd[src] = 0;
@@ -20,11 +20,11 @@ void move_on_board(Board * board,Move* move){
     store_board_flag(move,board);
 
     //castling
-    if(p==turn*6&&is_castling(move,1)==1){
-        board->brd[dest-1] = 4*turn; 
+    if(p==turn*King && is_castling(move,1)==1){
+        board->brd[dest-1] = turn*Rook; 
         board->brd[dest+1] = 0;
-    }else if(p==turn*6&&is_castling(move,0)==1){
-        board->brd[dest+1] = 4*turn; 
+    }else if(p==turn*King && is_castling(move,0)==1){
+        board->brd[dest+1] = turn*Rook; 
         board->brd[dest-2] = 0;
     }
 
@@ -33,13 +33,13 @@ void move_on_board(Board * board,Move* move){
     if(prom!=0&&p==turn){
         switch(prom){
             //Queen
-            case 1:board->brd[dest] = turn*5;break;
+            case 1:board->brd[dest] = turn*Queen;break;
             //Knight
-            case 2:board->brd[dest] = turn*2;break;
+            case 2:board->brd[dest] = turn*Night;break;
             //Rook
-            case 4:board->brd[dest] = turn*4;break;
+            case 4:board->brd[dest] = turn*Rook;break;
             //Bishop
-            case 8:board->brd[dest] = turn*3;break;
+            case 8:board->brd[dest] = turn*Bishop;break;
         }
     }
     //updating flags if pwan moves 2 square
@@ -60,7 +60,7 @@ void move_on_board(Board * board,Move* move){
     } 
 
     //updating king position and castling flag
-    if(p==6||p==-6){
+    if(p==King||p==-King){
         set_king_pos(board,turn,dest);
         set_castling_right(board,turn,1,0);
         set_castling_right(board,turn,0,0);
@@ -81,7 +81,7 @@ void unmove_on_board(Board * board,Move* move){
     int8 p = get_piece(move);
     int8 dest = get_destination(move); 
     int8 src = get_source(move);
-    int turn = get_turn(move);
+    Turn turn = get_turn(move);
 
     board->brd[src] = p;
     board->brd[dest] = get_captured_piece(move);
@@ -89,18 +89,18 @@ void unmove_on_board(Board * board,Move* move){
     restore_board_flag(move,board);
 
     //castling
-    if(p==6*turn&&is_castling(move,1)==1){
+    if(p==King*turn&&is_castling(move,1)==1){
         board->brd[dest-1] = 0; 
-        board->brd[dest+1] = 4*turn;
-    }else if(p==6*turn&&is_castling(move,0)==1){
-        board->brd[dest-2] = 4*turn;
+        board->brd[dest+1] = Rook*turn;
+    }else if(p==King*turn&&is_castling(move,0)==1){
+        board->brd[dest-2] = Rook*turn;
         board->brd[dest+1] = 0;
     }
 
     //promotion
     int prom = get_promotion(move);
     if(prom!=0&&p==turn){
-        board->brd[src] = turn;
+        board->brd[src] = turn*Pawn;
     }
 
     //En-passant
@@ -112,7 +112,7 @@ void unmove_on_board(Board * board,Move* move){
         } 
     }
     //updating king position
-    if(p==6*turn){
+    if(p==King*turn){
         set_king_pos(board,turn,src);
     }
 

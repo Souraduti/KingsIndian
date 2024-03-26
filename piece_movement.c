@@ -65,7 +65,7 @@ int promotion(Movelist* movelist,Move * move){
 void pawn(const Board * board,Movelist * movelist,const int8 sq){
     Move move;
     move.mv = 0;
-    int8 p = 1;
+    int8 p = Pawn;
     int8 dest;
     if(p!=board->brd[sq]) p=-p;
     set_piece(&move,p);
@@ -105,6 +105,7 @@ void pawn(const Board * board,Movelist * movelist,const int8 sq){
         set_captured_piece(&move,0);
         //En-passant
         int c = get_pawn_jump(board,-1);
+        /*sq>>3 checks if the white  pawn is in 5 th rank where En-passant is possible*/
         if(c==-1||(sq>>3)!=4) return;
         if((32+c-sq)==1||(32+c-sq)==-1){
             set_destination(&move,40+c);
@@ -146,6 +147,7 @@ void pawn(const Board * board,Movelist * movelist,const int8 sq){
         set_captured_piece(&move,0);
         //En-passant
         int c = get_pawn_jump(board,1);
+        /*sq>>3 checks if the Black  pawn is in 4th rank where En-passant is possible*/
         if(c==-1||(sq>>3)!=3) return;
         if((24+c-sq)==1||(24+c-sq)==-1){
             set_destination(&move,16+c);
@@ -159,7 +161,7 @@ void night(const Board * board,Movelist * movelist,const int8 sq){
     int i;
     Move move;
     move.mv = 0;
-    int8 p = 2;
+    int8 p = Night;
     int8 dest;
     if(p!=board->brd[sq]) p=-p;
     set_piece(&move,p);
@@ -177,7 +179,7 @@ void bishop(const Board * board,Movelist * movelist,const int8 sq){
     int i,j;
     Move move;
     move.mv = 0; 
-    int8 p = 3;
+    int8 p = Bishop;
     int8 dest;
     if(p!=board->brd[sq]) p=-p;
     set_piece(&move,p);
@@ -187,15 +189,12 @@ void bishop(const Board * board,Movelist * movelist,const int8 sq){
         while(in_board(sq,offset[i],j)==1){
             dest = sq+j*offset[i];
             if(is_sameside(p,board->brd[dest])==1) break;
-            if(is_opponent(p,board->brd[dest])==1){             
-                set_destination(&move,dest);
-                set_captured_piece(&move,board->brd[dest]);
-                add_move(movelist,move);
-                break;
-            }
-            set_captured_piece(&move,board->brd[dest]);              
             set_destination(&move,dest);
+            set_captured_piece(&move,board->brd[dest]); 
             add_move(movelist,move); 
+            if(is_opponent(p,board->brd[dest])==1){
+                break;             
+            }
             j++;
         }
     }
@@ -205,7 +204,7 @@ void rook(const Board * board,Movelist * movelist,const int8 sq){
     int i,j;
     Move move;
     move.mv = 0; 
-    int8 p = 4;
+    int8 p = Rook;
     int8 dest;
     if(p!=board->brd[sq]) p=-p;
     set_piece(&move,p);
@@ -215,15 +214,12 @@ void rook(const Board * board,Movelist * movelist,const int8 sq){
         while(in_board(sq,offset[i],j)==1){
             dest = sq+j*offset[i];
             if(is_sameside(p,board->brd[dest])==1) break;
-            if(is_opponent(p,board->brd[dest])==1){               
-                set_destination(&move,dest);
-                set_captured_piece(&move,board->brd[dest]);
-                add_move(movelist,move);
-                break;
-            }
             set_captured_piece(&move,board->brd[dest]);                 
             set_destination(&move,dest);
             add_move(movelist,move); 
+            if(is_opponent(p,board->brd[dest])==1){
+                break;             
+            }
             j++;
         }
     }
@@ -233,7 +229,7 @@ void queen(const Board * board,Movelist * movelist,int8 sq){
     int i,j;
     Move move;
     move.mv = 0;
-    int8 p = 5;
+    int8 p = Queen;
     int8 dest;
     if(p!=board->brd[sq]) p=-p;
     set_piece(&move,p);
@@ -243,33 +239,30 @@ void queen(const Board * board,Movelist * movelist,int8 sq){
         while(in_board(sq,offset[i],j)==1){
             dest = sq+j*offset[i];
             if(is_sameside(p,board->brd[dest])==1) break;
-            if(is_opponent(p,board->brd[dest])==1){              
-                set_destination(&move,dest);
-                set_captured_piece(&move,board->brd[dest]);
-                add_move(movelist,move);
-                break;
-            }
             set_captured_piece(&move,board->brd[dest]);                 
             set_destination(&move,dest);
             add_move(movelist,move); 
+            if(is_opponent(p,board->brd[dest])==1){
+                break;             
+            }
             j++;
         }
     }
 }
-void castling(const Board * board,Movelist * movelist,int turn){
-    int k = (turn==1)?4:60;
+void castling(const Board * board,Movelist * movelist,Turn turn){
+    int k = (turn==White)?4:60;
     Move m;
     //short
     if(get_castling_right(board,turn,1)==1){
-        if(board->brd[k]!=turn*6) goto out1;
+        if(board->brd[k]!=turn*King) goto out1;
         if(board->brd[k+1]!=0) goto out1;
         if(board->brd[k+2]!=0) goto out1;
-        if(board->brd[k+3]!=turn*4) goto out1;
+        if(board->brd[k+3]!=turn*Rook) goto out1;
         if(is_opponent_controls(board,k,turn)==1) goto out1;
         if(is_opponent_controls(board,k+1,turn)==1) goto out1;
         if(is_opponent_controls(board,k+2,turn)==1) goto out1;
         m.mv = 0;
-        set_piece(&m,turn*6);
+        set_piece(&m,turn*King);
         set_source(&m,k);
         set_destination(&m,k+2);
         set_castling(&m,1);
@@ -287,7 +280,7 @@ void castling(const Board * board,Movelist * movelist,int turn){
         if(is_opponent_controls(board,k-1,turn)==1) goto out2;
         if(is_opponent_controls(board,k-2,turn)==1) goto out2;
         m.mv = 0;
-        set_piece(&m,turn*6);
+        set_piece(&m,turn*King);
         set_source(&m,k);
         set_destination(&m,k-2);
         set_castling(&m,0);
@@ -301,7 +294,7 @@ void king(const Board * board,Movelist * movelist,int8 sq){
     int i;
     Move move;
     move.mv = 0;
-    int8 p = 6;
+    int8 p = King;
     int8 dest;
     if(p!=board->brd[sq]) p=-p;
     set_piece(&move,p);
@@ -316,24 +309,24 @@ void king(const Board * board,Movelist * movelist,int8 sq){
     castling(board,movelist,p/6);
 }
 
-int is_opponent_controls(const Board * board,int8 sq,int turn){
+int is_opponent_controls(const Board * board,int8 sq,Turn turn){
     int kn_off[8] = {6,-6,15,-15,10,-10,17,-17};
     int offset[8] = {1,-1,8,-8,7,-7,9,-9};
     int i;
     for(i=0;i<8;i++){
         // for night 
-        if(in_board(sq,kn_off[i],1)==1&&board->brd[sq+kn_off[i]]==-turn*2) return 1;
+        if(in_board(sq,kn_off[i],1)==1&&board->brd[sq+kn_off[i]]==-turn*Night) return 1;
         //for king
-        if(in_board(sq,offset[i],1)==1&&board->brd[sq+offset[i]]==-turn*6) return 1;
+        if(in_board(sq,offset[i],1)==1&&board->brd[sq+offset[i]]==-turn*King) return 1;
     }
 
     //pawns
-    if(turn==1){
-       if(in_board(sq,9,1)==1&&board->brd[sq+9]==-1) return 1; 
-       if(in_board(sq,7,1)==1&&board->brd[sq+7]==-1) return 1; 
+    if(turn==White){
+       if(in_board(sq,9,1)==1&&board->brd[sq+9]==-Pawn) return 1; 
+       if(in_board(sq,7,1)==1&&board->brd[sq+7]==-Pawn) return 1; 
     }else{
-       if(in_board(sq,-9,1)==1&&board->brd[sq-9]==1) return 1; 
-       if(in_board(sq,-7,1)==1&&board->brd[sq-7]==1) return 1; 
+       if(in_board(sq,-9,1)==1&&board->brd[sq-9]==Pawn) return 1; 
+       if(in_board(sq,-7,1)==1&&board->brd[sq-7]==Pawn) return 1; 
     }
     for(i=0;i<8;i++){
         int j = 1;
@@ -342,11 +335,11 @@ int is_opponent_controls(const Board * board,int8 sq,int turn){
             if(is_sameside(turn,board->brd[dest])==1) break;
             if(is_opponent(turn,board->brd[dest])==1){
                 //queen
-                if(board->brd[dest]==-turn*5) return 1;
+                if(board->brd[dest]==-turn*Queen) return 1;
                 //rook
-                if(board->brd[dest]==-turn*4&&i<4) return 1;
+                if(board->brd[dest]==-turn*Rook && i<4) return 1;
                 //bishop
-                if(board->brd[dest]==-turn*3&&i>=4) return 1;
+                if(board->brd[dest]==-turn*Bishop && i>=4) return 1;
                 //any other piece can not attack
                 break;
             }

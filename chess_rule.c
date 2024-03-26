@@ -7,7 +7,7 @@
 #include "make_unmake.c"
 
 
-int in_check(const Board * board,int turn){
+int in_check(const Board * board,Turn turn){
     int8 sq = get_king_pos(board,turn);
     return is_opponent_controls(board,sq,turn);
 }
@@ -34,6 +34,7 @@ int cmp(Move * m1,Move * m2){
     if(c2<0) c2=-c2;
     if(c1>c2) return 1;
     if(c1<c2) return 0;
+    if(c1==0&&c2==0) return 1;
     p1 = get_piece(m1);
     p2 = get_piece(m2);
     if(p1<0) p1=-p1;
@@ -72,7 +73,7 @@ void filter_move(Board *board,Movelist * all_move,int turn){
     flag = 0 -> all pseudo-legal move
     flag = 1 -> only legal moves 
 */
-Movelist generate_all(Board *board,Movelist * all_move,int turn,int flag){
+Movelist generate_all(Board *board,Movelist * all_move,Turn turn,int flag){
     all_move->size=0;
     int i;
     for(i=0;i<64;i++){
@@ -105,20 +106,20 @@ Movelist generate_all(Board *board,Movelist * all_move,int turn,int flag){
     order_moves(all_move);
 }
 
-int is_checkmate(Board* board,int turn){
+int is_checkmate(Board* board,Turn turn){
     if(in_check(board,turn)==0) return 0;
     Movelist moves;
     generate_all(board,&moves,turn,1);
     return (moves.size==0)?1:0;
 }
-int is_stalemate(Board * board,int turn){
+int is_stalemate(Board * board,Turn turn){
     if(in_check(board,turn)==1) return 0;
     Movelist moves;
     generate_all(board,&moves,turn,1);
     return (moves.size==0)?1:0;
 }
 
-int is_gameover(Board * board,int turn){
+int is_gameover(Board * board,Turn turn){
     int cheked = in_check(board,turn);
     Movelist moves;
     generate_all(board,&moves,turn,1);

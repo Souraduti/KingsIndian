@@ -11,7 +11,7 @@
 
 int main(){
 
-    int choice = 0,first_move=1,count=0;
+    int choice = 0,first_move=0,count=0;
     time_t t,start,end;
     double elapsed,total=0;
     srand((unsigned)time(&t));
@@ -105,5 +105,7 @@ int main(){
     
     display(&board);
     printf("Avarage time spend by Computer  : %lf\n",total/count);
+    fflush(stdin);
+    getchar();
     return 0;
 }

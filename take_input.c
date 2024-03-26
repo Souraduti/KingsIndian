@@ -13,7 +13,7 @@
 */
 
 /* accepts all input in lower case */
-Move user_input(Board * board, int turn){
+Move user_input(Board * board,const Turn turn){
     int i; 
     int8 src,dest;
     char p; 
@@ -27,7 +27,7 @@ Move user_input(Board * board, int turn){
     if(in_check(board,turn)==1){
         printf("-----Check-----\n");
     }
-    if(turn==1){
+    if(turn==White){
         printf("White's turn : \n");
     }else if(turn==-1){
         printf("Black's turn : \n");
@@ -55,7 +55,7 @@ Move user_input(Board * board, int turn){
     }else{
         src = (from[0]-'a')+(from[1]-'1')*8;
     }
-    if(turn==1){
+    if(turn==White){
         p = p+'A'-'a';
     }
     if(board->brd[src]!=get_pcode(p)){
@@ -74,8 +74,7 @@ Move user_input(Board * board, int turn){
     
     if((p=='K'&&src==4&&dest==6)||(p=='k'&&src==60&&dest==62)){
         //short castle
-        set_castling(&user_move,1);
-        //user_move.mv = user_move.mv|(1<<20); 
+        set_castling(&user_move,1); 
     }else if((p=='K'&&src==4&&dest==2)||(p=='k'&&src==60&&dest==58)){
         //long castle
         set_castling(&user_move,0); 
@@ -95,7 +94,6 @@ Move user_input(Board * board, int turn){
             printf("4 for Bishop\n");
             scanf("%d",&ch);
         }while(ch<=0||ch>4);
-        //for setting promotion flag 
         set_promotion(&user_move,(1<<(ch-1)));
     }
     set_piece(&user_move,get_pcode(p));

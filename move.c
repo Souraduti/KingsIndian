@@ -42,6 +42,7 @@ void clear_movelist(Movelist * movelist){
     movelist->size = 0;
 }
 
+
 int8 get_source(Move * move){
     int flag = 0b00000000000000000000000000111111;
     int off = 0;
@@ -99,8 +100,8 @@ void set_captured_piece(Move * move,int8 piece){
     move->mv = (move->mv)|((piece<<off)&flag);
 }
 
-int get_turn(const Move * move){
-    return ((move->mv&(1<<15))==0)?1:-1;
+Turn get_turn(const Move * move){
+    return ((move->mv&(1<<15))==0)?White:Black;
 }
 int is_castling(const Move * move,int side){
     int off = 1-side+20;
@@ -135,7 +136,7 @@ void clear_enpassant(Move * move){
     move->mv = ~(~(move->mv)|(1<<24));
 }
 void store_board_flag(Move * move,Board * board){
-    int turn = get_turn(move);
+    Turn turn = get_turn(move);
     if(get_castling_right(board,turn,1)==1){
         //short
         move->mv|=(1<<25);
@@ -151,7 +152,7 @@ void store_board_flag(Move * move,Board * board){
     }
 }
 void restore_board_flag(Move * move,Board * board){
-    int turn = get_turn(move);
+    Turn turn = get_turn(move);
     int file = (move->mv>>27)&15;
     if((move->mv&(1<<31))==0){
         set_pawn_jump(board,-1,turn);
@@ -189,6 +190,12 @@ void display_move(Move * move){
         printf("capturing %c ",cpt);
     }
     printf("\n");
+}
+void show_all_moves(Movelist *moves){
+    int i;
+    for(i=0;i<moves->size;i++){
+        display_move(&(moves->list[i]));
+    }
 }
 
 #endif

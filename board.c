@@ -16,6 +16,21 @@
   -ve values are used Black pieces
   +ve values are for White Pieces
 */
+typedef enum Pieces{
+    Empty = 0,
+    Pawn = 1,
+    Night = 2,
+    Bishop = 3 ,
+    Rook =4,
+    Queen = 5,
+    King = 6
+}Pices;
+
+typedef enum Turn{
+    White = 1,
+    Black = -1
+}Turn;
+
 
 /*
     Board Representation :
@@ -39,45 +54,36 @@ typedef struct Board
 /* sets the pieces on the board in initial configuration */
 void set_board(Board * board){
 
-    board->brd[0] = 4;
-    board->brd[1] = 2;
-    board->brd[2] = 3;
-    board->brd[3] = 5;
-    board->brd[4] = 6;
-    board->brd[5] = 3;
-    board->brd[6] = 2;
-    board->brd[7] = 4;
+    board->brd[0] = Rook;
+    board->brd[1] = Night;
+    board->brd[2] = Bishop;
+    board->brd[3] = Queen;
+    board->brd[4] = King;
+    board->brd[5] = Bishop;
+    board->brd[6] = Night;
+    board->brd[7] = Pawn;
 
-    board->brd[56] = -4;
-    board->brd[57] = -2;
-    board->brd[58] = -3;
-    board->brd[59] = -5;
-    board->brd[60] = -6;
-    board->brd[61] = -3;
-    board->brd[62] = -2;
-    board->brd[63] = -4;
-
-    board->brd[8]  = 1;
-    board->brd[9]  = 1;
-    board->brd[10] = 1;
-    board->brd[11] = 1;
-    board->brd[12] = 1;
-    board->brd[13] = 1;
-    board->brd[14] = 1;
-    board->brd[15] = 1;
-
-    board->brd[48] = -1;
-    board->brd[49] = -1;
-    board->brd[50] = -1;
-    board->brd[51] = -1;
-    board->brd[52] = -1;
-    board->brd[53] = -1;
-    board->brd[54] = -1;
-    board->brd[55] = -1;
+    board->brd[56] = -Rook;
+    board->brd[57] = -Night;
+    board->brd[58] = -Bishop;
+    board->brd[59] = -Queen;
+    board->brd[60] = -King;
+    board->brd[61] = -Bishop;
+    board->brd[62] = -Night;
+    board->brd[63] = -Rook;
 
     int i;
+    for(i=8;i<16;i++){
+        board->brd[i] = Pawn;
+    }
+
+    for(i=48;i<56;i++){
+        board->brd[i] = -Pawn;
+    }
+   
+
     for(i = 16;i<48;i++){
-        board->brd[i] = 0;
+        board->brd[i] = Empty;
     }
     /* 984304 in binary => 000000000000011110000010011110000*/
     board->flag = 984304;
@@ -134,14 +140,14 @@ void * display(const Board * board){
 }
 
 //63 => 00111111
-int8 get_king_pos(const Board * board,int turn){
+int8 get_king_pos(const Board * board,Turn turn){
     int8 sq;
-    int off = (turn==1)?8:14;
+    int off = (turn==White)?8:14;
     sq = (board->flag>>off)&63;
     return sq;
 }
-void set_king_pos(Board * board,int turn,int8 sq){
-    int off = (turn==1)?8:14;
+void set_king_pos(Board * board,Turn turn,int8 sq){
+    int off = (turn==White)?8:14;
     board->flag = ~(~(board->flag)|(63<<off));
     board->flag = board->flag|((sq&63)<<off);
 }
@@ -153,13 +159,13 @@ int get_pawn_jump(const Board * board,int turn){
     if(turn==1&&(last&(1<<3))!=0) return -1;
     return last&7;
 }
-void set_pawn_jump(Board * board,int file,int turn){
+void set_pawn_jump(Board * board,int file,Turn turn){
     if(file==-1){
         board->flag = ~((~board->flag)|(1<<20));
         board->flag = ~((~board->flag)|15);
         return;
     }
-    if(turn==-1) file+=8;
+    if(turn==Black) file+=8;
     board->flag|= 1<<20;
     board->flag = board->flag&(~15);
     board->flag|= file;
@@ -168,12 +174,12 @@ void set_pawn_jump(Board * board,int file,int turn){
     side = 1 for short
     side = 0 for long
 */
-int get_castling_right(const Board * board ,int turn,int side){
+int get_castling_right(const Board * board ,Turn turn,int side){
     int off = 5+turn+side;
     if((board->flag&(1<<off))==0) return 0;
     return 1;
 }
-void set_castling_right(Board * board ,int turn,int side,int v){
+void set_castling_right(Board * board ,Turn turn,int side,int v){
     int off = 5+turn+side;;
     if(v==0){
         board->flag = ~(~(board->flag)|(1<<off));

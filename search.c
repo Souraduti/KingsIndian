@@ -29,7 +29,7 @@ Move random_move(Board * board,int turn){
     to encourage it to choose fastest mate 
 
 */
-int evaluate(Board * board,int turn,int depth,int* legal,int alpha,int beta){
+int evaluate(Board * board,Turn turn,int depth,int* legal,int alpha,int beta){
     if(depth==0){
         return static_eval(board);
     }
@@ -51,7 +51,7 @@ int evaluate(Board * board,int turn,int depth,int* legal,int alpha,int beta){
             //the move was illegal
             continue;
         }
-        if(turn==1){
+        if(turn==White){
             if(best_eval<eval) best_eval = eval;
             if(alpha<eval) alpha = eval; 
         }else{
@@ -61,6 +61,7 @@ int evaluate(Board * board,int turn,int depth,int* legal,int alpha,int beta){
         count++;
         if(beta<=alpha) break;
     }
+            
     if(count==0){
         if(in_check(board,turn)==0){
             //stalemate
@@ -72,7 +73,7 @@ int evaluate(Board * board,int turn,int depth,int* legal,int alpha,int beta){
     }
     return best_eval;
 }
-Move computer_move(Board * board,const int turn){
+Move computer_move(Board * board,Turn turn){
     Move move;
     if(is_checkmate(board,turn)==1){
         move.mv = -1;
@@ -83,28 +84,21 @@ Move computer_move(Board * board,const int turn){
     }
     Movelist all_moves;
     int i,eval,e;
-    if(turn==1){
+    if(turn==White){
         /*for White lowest possible value of eval */
         eval = -INF;
     }else{
         /*for Black highest possible value of eval */
         eval = INF;
     }
-    int legal=1,total = piece_count(board),depth = MAXDEPTH;
-    if(total<500){
-    	depth = 8;
-	}else if(total<800){
-		depth = 7;
-	}else if(total<1200){
-		depth = 6;
-	}
+    int legal=1,total = piece_count(board);
     generate_all(board,&all_moves,turn,1);
     move = all_moves.list[0];
     for(i=0;i<all_moves.size;i++){
         move_on_board(board,&all_moves.list[i]);
-        e = evaluate(board,-turn,depth,&legal,-INF,INF);
+        e = evaluate(board,-turn,MAXDEPTH,&legal,-INF,INF);
         unmove_on_board(board,&all_moves.list[i]);
-        if(turn==1){
+        if(turn==White){
             /*White finds the maximum evaluation*/
             if(e>eval){
                 eval = e;
