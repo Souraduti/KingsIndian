@@ -62,14 +62,14 @@ void move_on_board(Board * board,Move* move){
     //updating king position and castling flag
     if(p==King||p==-King){
         set_king_pos(board,turn,dest);
-        set_castling_right(board,turn,1,0);
-        set_castling_right(board,turn,0,0);
+        set_castling_right(board,turn,Short,0);
+        set_castling_right(board,turn,Long,0);
     }
     if((p==4&&src==7)||(p==-4&&src==63)){
-        set_castling_right(board,turn,1,0);
+        set_castling_right(board,turn,Short,0);
     }
     if((p==4&&src==0)||(p==-4&&src==56)){
-        set_castling_right(board,turn,0,0);
+        set_castling_right(board,turn,Long,0);
     }
 
 }
@@ -89,10 +89,10 @@ void unmove_on_board(Board * board,Move* move){
     restore_board_flag(move,board);
 
     //castling
-    if(p==King*turn&&is_castling(move,1)==1){
+    if(p==King*turn&&is_castling(move,Short)==1){
         board->brd[dest-1] = 0; 
         board->brd[dest+1] = Rook*turn;
-    }else if(p==King*turn&&is_castling(move,0)==1){
+    }else if(p==King*turn&&is_castling(move,Long)==1){
         board->brd[dest-2] = Rook*turn;
         board->brd[dest+1] = 0;
     }

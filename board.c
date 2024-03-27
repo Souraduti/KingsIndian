@@ -23,6 +23,10 @@ typedef enum Turn{
     Black = -1
 }Turn;
 
+typedef enum Castling_side{
+    Short = 1,
+    Long = 0
+}Castling_side;
 
 /*
     Board Representation :
@@ -162,16 +166,12 @@ void set_pawn_jump(Board * board,int file,Turn turn){
     board->flag = board->flag&(~15);
     board->flag|= file;
 }
-/*
-    side = 1 for short
-    side = 0 for long
-*/
-int get_castling_right(const Board * board ,Turn turn,int side){
+int get_castling_right(const Board * board ,Turn turn,Castling_side side){
     int off = 5+turn+side;
     if((board->flag&(1<<off))==0) return 0;
     return 1;
 }
-void set_castling_right(Board * board ,Turn turn,int side,int v){
+void set_castling_right(Board * board ,Turn turn,Castling_side side,int v){
     int off = 5+turn+side;;
     if(v==0){
         board->flag = ~(~(board->flag)|(1<<off));

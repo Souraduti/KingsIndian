@@ -92,9 +92,9 @@ void enpassant(const Board * board,Movelist * movelist,const int8 sq){
 void pawn(const Board * board,Movelist * movelist,const int8 sq){
     Move move;
     move.mv = 0;
-    int8 p = Pawn;
+    int8 p = board->brd[sq];
     int8 dest;
-    if(p!=board->brd[sq]) p=-p;
+    if(p!=Pawn&&p!=-Pawn) return;
     set_piece(&move,p);
     set_source(&move,sq);
     if(p==1){
@@ -170,9 +170,9 @@ void night(const Board * board,Movelist * movelist,const int8 sq){
     int i;
     Move move;
     move.mv = 0;
-    int8 p = Night;
+    int8 p = board->brd[sq];
     int8 dest;
-    if(p!=board->brd[sq]) p=-p;
+    if(p!=Night&&p!=-Night) return;
     set_piece(&move,p);
     set_source(&move,sq);
     for(i=0;i<8;i++){
@@ -188,9 +188,9 @@ void bishop(const Board * board,Movelist * movelist,const int8 sq){
     int i,j;
     Move move;
     move.mv = 0; 
-    int8 p = Bishop;
+    int8 p = board->brd[sq];
     int8 dest;
-    if(p!=board->brd[sq]) p=-p;
+    if(p!=Bishop&&p!=-Bishop) return;
     set_piece(&move,p);
     set_source(&move,sq);
     for(i=0;i<4;i++){
@@ -213,9 +213,9 @@ void rook(const Board * board,Movelist * movelist,const int8 sq){
     int i,j;
     Move move;
     move.mv = 0; 
-    int8 p = Rook;
+    int8 p = board->brd[sq];
     int8 dest;
-    if(p!=board->brd[sq]) p=-p;
+    if(p!=Rook&&p!=-Rook) return;
     set_piece(&move,p);
     set_source(&move,sq);
     for(i=0;i<4;i++){
@@ -238,9 +238,9 @@ void queen(const Board * board,Movelist * movelist,int8 sq){
     int i,j;
     Move move;
     move.mv = 0;
-    int8 p = Queen;
+    int8 p = board->brd[sq];
     int8 dest;
-    if(p!=board->brd[sq]) p=-p;
+    if(p!=Queen&&p!=-Queen) return;
     set_piece(&move,p);
     set_source(&move,sq);
     for(i=0;i<8;i++){
@@ -262,7 +262,7 @@ void castling(const Board * board,Movelist * movelist,Turn turn){
     int k = (turn==White)?4:60;
     Move m;
     //short
-    if(get_castling_right(board,turn,1)==1){
+    if(get_castling_right(board,turn,Short)==1){
         if(board->brd[k]!=turn*King) goto out1;
         if(board->brd[k+1]!=0) goto out1;
         if(board->brd[k+2]!=0) goto out1;
@@ -274,12 +274,12 @@ void castling(const Board * board,Movelist * movelist,Turn turn){
         set_piece(&m,turn*King);
         set_source(&m,k);
         set_destination(&m,k+2);
-        set_castling(&m,1);
+        set_castling(&m,Short);
         add_move(movelist,m);
     }
     out1:
     //long
-    if(get_castling_right(board,turn,0)==1){
+    if(get_castling_right(board,turn,Long)==1){
         if(board->brd[k]!=turn*6) goto out2;
         if(board->brd[k-1]!=0) goto out2;
         if(board->brd[k-2]!=0) goto out2;
@@ -292,7 +292,7 @@ void castling(const Board * board,Movelist * movelist,Turn turn){
         set_piece(&m,turn*King);
         set_source(&m,k);
         set_destination(&m,k-2);
-        set_castling(&m,0);
+        set_castling(&m,Long);
         add_move(movelist,m);
     }
     out2:
@@ -303,9 +303,9 @@ void king(const Board * board,Movelist * movelist,int8 sq){
     int i;
     Move move;
     move.mv = 0;
-    int8 p = King;
+    int8 p = board->brd[sq];
     int8 dest;
-    if(p!=board->brd[sq]) p=-p;
+    if(p!=King&&p!=-King) return;
     set_piece(&move,p);
     set_source(&move,sq);
     for(i=0;i<8;i++){
@@ -315,7 +315,7 @@ void king(const Board * board,Movelist * movelist,int8 sq){
         set_captured_piece(&move,board->brd[dest]);
         add_move(movelist,move);     
     }
-    castling(board,movelist,p/6);
+    castling(board,movelist,p/King);
 }
 
 int is_opponent_controls(const Board * board,int8 sq,Turn turn){

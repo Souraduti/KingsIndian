@@ -35,13 +35,12 @@ int add_move(Movelist * movelist,Move move){
 }
 
 void clear_movelist(Movelist * movelist){
-    int i = 0;
-    for(i =0;i<100;i++){
-        movelist->list[i].mv =0;
+    int i;
+    for(i = 0;i<LIST_LENGTH;i++){
+        movelist->list[i].mv = 0;
     }
     movelist->size = 0;
 }
-
 
 int8 get_source(Move * move){
     int flag = 0b00000000000000000000000000111111;
@@ -103,15 +102,15 @@ void set_captured_piece(Move * move,int8 piece){
 Turn get_turn(const Move * move){
     return ((move->mv&(1<<15))==0)?White:Black;
 }
-int is_castling(const Move * move,int side){
+int is_castling(const Move * move,Castling_side side){
     int off = 1-side+20;
     return ((move->mv&(1<<off))==0)?0:1;
 }
-void set_castling(Move * move,int side){
+void set_castling(Move * move,Castling_side side){
     int off = 1-side+20;
     move->mv = move->mv|(1<<off);
 }
-void clear_castling(Move * move,int side){
+void clear_castling(Move * move,Castling_side side){
     int off = 1-side+20;
     move->mv = ~(~(move->mv)|(1<<off));
 }
@@ -137,11 +136,11 @@ void clear_enpassant(Move * move){
 }
 void store_board_flag(Move * move,Board * board){
     Turn turn = get_turn(move);
-    if(get_castling_right(board,turn,1)==1){
+    if(get_castling_right(board,turn,Short)==1){
         //short
         move->mv|=(1<<25);
     }
-    if(get_castling_right(board,turn,0)==1){
+    if(get_castling_right(board,turn,Long)==1){
         //long
         move->mv|=(1<<26);
     }
@@ -160,8 +159,8 @@ void restore_board_flag(Move * move,Board * board){
         set_pawn_jump(board,file,0);
     }
 
-    set_castling_right(board,turn,1,(move->mv>>25)&1);
-    set_castling_right(board,turn,0,(move->mv>>26)&1);
+    set_castling_right(board,turn,Short,(move->mv>>25)&1);
+    set_castling_right(board,turn,Long,(move->mv>>26)&1);
 
     move->mv = move->mv&((1<<25)-1);
 }
