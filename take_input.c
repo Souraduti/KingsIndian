@@ -7,11 +7,6 @@
 #include "chess_rule.c"
 
 
-/*
-    turn = -1 -> black
-    turn = 1  -> white
-*/
-
 /* accepts all input in lower case */
 Move user_input(Board * board,const Turn turn){
     int i; 
@@ -73,11 +68,9 @@ Move user_input(Board * board,const Turn turn){
     }
     
     if((p=='K'&&src==4&&dest==6)||(p=='k'&&src==60&&dest==62)){
-        //short castle
-        set_castling(&user_move,1); 
+        set_castling(&user_move,Short); 
     }else if((p=='K'&&src==4&&dest==2)||(p=='k'&&src==60&&dest==58)){
-        //long castle
-        set_castling(&user_move,0); 
+        set_castling(&user_move,Long); 
     }
 
     if((p=='P'||p=='p')&&((src-dest)%8!=0)&&board->brd[dest]==0){
