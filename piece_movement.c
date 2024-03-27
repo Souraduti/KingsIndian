@@ -8,7 +8,7 @@
     logic for movement of all the pieces 
 */
 
-int is_opponent_controls(const Board * board,int8 sq,int turn);
+int is_opponent_controls(const Board * board,int8 sq,Turn turn);
 
 int in_board(int8 sq,int dir,int step){
     if(sq<0||sq>=64) return 0;
@@ -62,6 +62,33 @@ int promotion(Movelist* movelist,Move * move){
     clear_promotion(move);
     return 1;
 }
+void enpassant(const Board * board,Movelist * movelist,const int8 sq){
+    int c,side,rank,src_offset,dst_offset;
+    Move move;
+    move.mv = 0;
+    if(board->brd[sq]==Pawn){
+        side = -1;
+        rank = 4;
+        src_offset = 32;
+        dst_offset = 40;
+    }else{
+        side = 1;
+        rank = 5;
+        src_offset = 24;
+        dst_offset = 16;
+    }
+    c = get_pawn_jump(board,side);
+    if(c==-1||(sq>>3)!=rank) return;
+    if((src_offset+c-sq)==1||(src_offset+c-sq)==-1){
+        set_piece(&move,-side*Pawn);
+        set_source(&move,sq);
+        set_destination(&move,dst_offset+c);
+        /*Captured piece is not set as it would complecate unmaking move*/
+        set_enpassant(&move);
+        add_move(movelist,move);
+    }
+
+}
 void pawn(const Board * board,Movelist * movelist,const int8 sq){
     Move move;
     move.mv = 0;
@@ -102,16 +129,7 @@ void pawn(const Board * board,Movelist * movelist,const int8 sq){
                 add_move(movelist,move);
             }
         }
-        set_captured_piece(&move,0);
-        //En-passant
-        int c = get_pawn_jump(board,-1);
-        /*sq>>3 checks if the white  pawn is in 5 th rank where En-passant is possible*/
-        if(c==-1||(sq>>3)!=4) return;
-        if((32+c-sq)==1||(32+c-sq)==-1){
-            set_destination(&move,40+c);
-            set_enpassant(&move);
-            add_move(movelist,move);
-        }
+        enpassant(board,movelist,sq);
     }else{
         //black pawn
         // 1 square forward
@@ -144,16 +162,7 @@ void pawn(const Board * board,Movelist * movelist,const int8 sq){
                 add_move(movelist,move);
             }
         }
-        set_captured_piece(&move,0);
-        //En-passant
-        int c = get_pawn_jump(board,1);
-        /*sq>>3 checks if the Black  pawn is in 4th rank where En-passant is possible*/
-        if(c==-1||(sq>>3)!=3) return;
-        if((24+c-sq)==1||(24+c-sq)==-1){
-            set_destination(&move,16+c);
-            set_enpassant(&move);
-            add_move(movelist,move);
-        }
+        enpassant(board,movelist,sq);
     }
 }
 void night(const Board * board,Movelist * movelist,const int8 sq){

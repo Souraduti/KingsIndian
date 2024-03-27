@@ -3,10 +3,10 @@
 
 #include "board.c"
 #include "move.c"
-#include "piece_movement.c"
+#include "chess_rule.c"
 #include "static_evaluation.c"
 
-#define MAXDEPTH 4
+#define MAXDEPTH 5
 #define INF 500000
 
 /*gives a random legal move*/
@@ -75,10 +75,13 @@ int evaluate(Board * board,Turn turn,int depth,int* legal,int alpha,int beta){
 }
 Move computer_move(Board * board,Turn turn){
     Move move;
-    if(is_checkmate(board,turn)==1){
+    int g = is_gameover(board,turn);
+    if(g==-1){
+        //Checkmate
         move.mv = -1;
         return move;
-    }else if(is_stalemate(board,turn)==1){
+    }else if(g==1){
+        //Stalemate
         move.mv = 0;
         return move;
     }

@@ -34,12 +34,14 @@ int cmp(Move * m1,Move * m2){
     if(c2<0) c2=-c2;
     if(c1>c2) return 1;
     if(c1<c2) return 0;
-    if(c1==0&&c2==0) return 1;
+    if(c1==0&&c2==0) return rand()%2;
     p1 = get_piece(m1);
     p2 = get_piece(m2);
     if(p1<0) p1=-p1;
     if(p2<0) p2=-p2;
-    return (p1<=p2)?1:0;
+    if(p1>p2) return 0;
+    if(p1<p2) return 1;
+    return rand()%2;
 }
 void order_moves(Movelist * movelist){
     int i,j;

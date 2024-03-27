@@ -2,17 +2,9 @@
 #ifndef BOARD 
 #define BOARD
 
-#include <stdio.h>
 
 /*
   Pieces Representation
-  0 -> Empty Square
-  1 -> pawn
-  2 -> Night
-  3 -> Bishop
-  4 -> Rook 
-  5 -> Queen
-  6 -> King
   -ve values are used Black pieces
   +ve values are for White Pieces
 */
@@ -21,7 +13,7 @@ typedef enum Pieces{
     Pawn = 1,
     Night = 2,
     Bishop = 3 ,
-    Rook =4,
+    Rook = 4,
     Queen = 5,
     King = 6
 }Pices;
@@ -61,7 +53,7 @@ void set_board(Board * board){
     board->brd[4] = King;
     board->brd[5] = Bishop;
     board->brd[6] = Night;
-    board->brd[7] = Pawn;
+    board->brd[7] = Rook;
 
     board->brd[56] = -Rook;
     board->brd[57] = -Night;
@@ -139,10 +131,10 @@ void * display(const Board * board){
     printf("\n");
 }
 
-//63 => 00111111
 int8 get_king_pos(const Board * board,Turn turn){
     int8 sq;
     int off = (turn==White)?8:14;
+    //63 => 00111111
     sq = (board->flag>>off)&63;
     return sq;
 }
