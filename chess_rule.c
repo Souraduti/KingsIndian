@@ -1,5 +1,4 @@
 
-
 #include "chess_rule.h"
 
 
@@ -12,7 +11,7 @@ int in_check(const Board * board,Turn turn){
     checks if the move leaves king vulnarable to check.
     if a psudo-legal move is legal or not
 */
-int is_playable(Board *board,Move * move,int turn){
+int is_playable(Board *board,Move * move,Turn turn){
     int ch = 1;
     move_on_board(board,move);
     if(in_check(board,turn)==1){
@@ -54,7 +53,7 @@ void order_moves(Movelist * movelist){
 }
 
 /*filters out illegal moves from pseudo-legal moves*/
-void filter_move(Board *board,Movelist * all_move,int turn){
+void filter_move(Board *board,Movelist * all_move,Turn turn){
     int i,last;
     last = all_move->size-1;
     for(i=0;i<=last&&last>=0;i++){
