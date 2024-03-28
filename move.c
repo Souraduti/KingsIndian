@@ -1,29 +1,5 @@
-#ifndef MOVE
-#define MOVE
 
-#include "board.c"
-
-#define LIST_LENGTH 128
-
-/*
-    Move representation : 
-    structure of mv
-    00000000000 0000  0000   000000 000000
-    |  flag |  |capt||piece| |dest| |source|
-
-    flag ->   00000  00  0   0000
-            prev-En  LS  En  BRNQ 
-                               LS
-                  prev-castle promotion&castling
-*/
-typedef struct Move{
-    int mv;
-}Move;
-
-typedef struct Movelist{
-    Move list[LIST_LENGTH];
-    int size;
-}Movelist;
+#include "move.h"
 
 int add_move(Movelist * movelist,Move move){
     if(movelist->size==LIST_LENGTH-1){
@@ -42,28 +18,28 @@ void clear_movelist(Movelist * movelist){
     movelist->size = 0;
 }
 
-int8 get_source(Move * move){
+int8 get_source(const Move * move){
     int flag = 0b00000000000000000000000000111111;
     int off = 0;
     int8 sq_code = (move->mv&flag)>>off;
     return sq_code;
 }
 
-int8 get_destination(Move * move){
+int8 get_destination(const Move * move){
     int flag = 0b00000000000000000000111111000000;
     int off = 6;
     int8 sq_code = (move->mv&flag)>>off;
     return sq_code;
 }
 
-int8 get_piece(Move * move){
+int8 get_piece(const Move * move){
     int flag = 0b00000000000000001111000000000000;
     int off = 12;
     int8 p_code = (move->mv&flag)>>off;
     if(p_code&(1<<3)) p_code =  p_code-16;
     return p_code;
 }
-int8 get_captured_piece(Move * move){
+int8 get_captured_piece(const Move * move){
     int flag = 0b00000000000011110000000000000000;
     int off = 16;
     int8 p_code = (move->mv&flag)>>off;
@@ -114,7 +90,7 @@ void clear_castling(Move * move,Castling_side side){
     int off = 1-side+20;
     move->mv = ~(~(move->mv)|(1<<off));
 }
-int get_promotion(Move * move){
+int get_promotion(const Move * move){
     return (move->mv>>20)&15;
 }
 int clear_promotion(Move * move){
@@ -165,7 +141,7 @@ void restore_board_flag(Move * move,Board * board){
     move->mv = move->mv&((1<<25)-1);
 }
 
-void display_move(Move * move){
+void display_move(const Move * move){
     
     char p,cpt;
     int8 src,dst;
@@ -190,11 +166,9 @@ void display_move(Move * move){
     }
     printf("\n");
 }
-void show_all_moves(Movelist *moves){
+void show_all_moves(const Movelist *moves){
     int i;
     for(i=0;i<moves->size;i++){
         display_move(&(moves->list[i]));
     }
 }
-
-#endif

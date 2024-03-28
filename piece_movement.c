@@ -1,14 +1,8 @@
-#ifndef PIECE_MOVEMENT 
-#define PIECE_MOVEMENT
-
-#include "board.c"
-#include "move.c"
+#include "piece_movement.h"
 
 /*
     logic for movement of all the pieces 
 */
-
-int is_opponent_controls(const Board * board,int8 sq,Turn turn);
 
 int in_board(int8 sq,int dir,int step){
     if(sq<0||sq>=64) return 0;
@@ -358,4 +352,14 @@ int is_opponent_controls(const Board * board,int8 sq,Turn turn){
     return 0;
 }
 
-#endif
+void generate_move(const Board * board,Movelist * movelist,int8 sq,int8 piece){
+    switch(piece){
+        case Pawn   : pawn(board,movelist,sq);   break;
+        case Night  : night(board,movelist,sq);  break;
+        case Bishop : bishop(board,movelist,sq); break;
+        case Rook   : rook(board,movelist,sq);   break;
+        case Queen  : queen(board,movelist,sq);  break;
+        case King   : king(board,movelist,sq);   break;
+    }
+
+}

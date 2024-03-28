@@ -1,9 +1,4 @@
-#ifndef STATIC_EVAL 
-#define STATIC_EVAL
-
-#include "board.c"
-
-int s = 0; 
+#include "static_evaluation.h"
 
 /*Activity tables for pieces */
 int _king[8][8] 
@@ -83,6 +78,7 @@ const int _pawn[8][8]
         { 5, 10, 10,-20,-20, 10, 10,  5},
         { 0,  0,  0,  0,  0,  0,  0,  0}
     };
+
 int get_piece_value(int8 p_code){
     int sign = 1,val;
     if(p_code<0){
@@ -166,13 +162,11 @@ int material(const Board *board){
 }
 
 int static_eval(const Board * board){
-    s++;
     return material(board)+activity(board,is_endgame(board));
 }
-int get_position_evaluated(){
+/*int get_position_evaluated(){
     int temp  = s;
     s = 0;
     return temp;
-}
+}*/
 
-#endif

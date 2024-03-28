@@ -1,55 +1,14 @@
 
-#ifndef BOARD 
-#define BOARD
+#include "board.h"
 
 
-/*
-  Pieces Representation
-  -ve values are used Black pieces
-  +ve values are for White Pieces
-*/
-typedef enum Pieces{
-    Empty = 0,
-    Pawn = 1,
-    Night = 2,
-    Bishop = 3 ,
-    Rook = 4,
-    Queen = 5,
-    King = 6
-}Pices;
 
-typedef enum Turn{
-    White = 1,
-    Black = -1
-}Turn;
 
-typedef enum Castling_side{
-    Short = 1,
-    Long = 0
-}Castling_side;
 
-/*
-    Board Representation :
-    brd  : Array of 8 bit charachters of size 64 stores all the pieces in board
-           0->a1  63 ->h8
-           
-    flag : lowest 4 bits indicate which of the 16 pawns has moved 2 square in last move
-           stored for En Passent 
-           next 4 bit stores castling rights  (w-short,w-long,b-short,b-long)
-           next 6 bit will store position of white king
-           next 6 bit will store position of black king
-           20th bit will be set if pawn has moved 2 Square
-*/
-typedef char int8;
-typedef struct Board
-{
-    int8 brd[64];
-    int flag;
-}Board;
 
 /* sets the pieces on the board in initial configuration */
-void set_board(Board * board){
-
+void set_board(Board * board)
+{
     board->brd[0] = Rook;
     board->brd[1] = Night;
     board->brd[2] = Bishop;
@@ -86,7 +45,8 @@ void set_board(Board * board){
 }
 
 /* sets an Empty Board */
-void set_empty_board(Board * board){
+void set_empty_board(Board * board)
+{
     int i;
     for(i=0;i<64;i++){
         board->brd[i] = 0;
@@ -120,7 +80,7 @@ int8 get_pcode(char p){
 }
 
 /* Displays the chess board */
-void * display(const Board * board){
+void  display(const Board * board){
     int i,j;
     
     printf("\n\n");
@@ -135,19 +95,22 @@ void * display(const Board * board){
     printf("\n");
 }
 
-int8 get_king_pos(const Board * board,Turn turn){
+int8 get_king_pos(const Board * board,Turn turn)
+{
     int8 sq;
     int off = (turn==White)?8:14;
     //63 => 00111111
     sq = (board->flag>>off)&63;
     return sq;
 }
-void set_king_pos(Board * board,Turn turn,int8 sq){
+void set_king_pos(Board * board,Turn turn,int8 sq)
+{
     int off = (turn==White)?8:14;
     board->flag = ~(~(board->flag)|(63<<off));
     board->flag = board->flag|((sq&63)<<off);
 }
-int get_pawn_jump(const Board * board,int turn){
+int get_pawn_jump(const Board * board,Turn turn)
+{
     int last = board->flag&15;
     if((board->flag&(1<<20))==0) return -1;
     if(turn==0) return last;
@@ -155,7 +118,8 @@ int get_pawn_jump(const Board * board,int turn){
     if(turn==1&&(last&(1<<3))!=0) return -1;
     return last&7;
 }
-void set_pawn_jump(Board * board,int file,Turn turn){
+void set_pawn_jump(Board * board,int file,Turn turn)
+{
     if(file==-1){
         board->flag = ~((~board->flag)|(1<<20));
         board->flag = ~((~board->flag)|15);
@@ -166,12 +130,14 @@ void set_pawn_jump(Board * board,int file,Turn turn){
     board->flag = board->flag&(~15);
     board->flag|= file;
 }
-int get_castling_right(const Board * board ,Turn turn,Castling_side side){
+int get_castling_right(const Board * board ,Turn turn,Castling_side side)
+{
     int off = 5+turn+side;
     if((board->flag&(1<<off))==0) return 0;
     return 1;
 }
-void set_castling_right(Board * board ,Turn turn,Castling_side side,int v){
+void set_castling_right(Board * board ,Turn turn,Castling_side side,int v)
+{
     int off = 5+turn+side;;
     if(v==0){
         board->flag = ~(~(board->flag)|(1<<off));
@@ -180,5 +146,5 @@ void set_castling_right(Board * board ,Turn turn,Castling_side side,int v){
     }
 }
 
-#endif
+
 

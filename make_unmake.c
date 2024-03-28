@@ -1,8 +1,6 @@
-#ifndef MAKE_UNMAKE
-#define MAKE_UNMAKE
 
-#include "board.c"
-#include "move.c"
+
+#include "make_unmake.h"
 
 /*
     makes a move on board . moves the appropiate pieces to proper squares
@@ -118,4 +116,4 @@ void unmove_on_board(Board * board,Move* move){
 
 }
 
-#endif
+

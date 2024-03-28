@@ -1,10 +1,6 @@
-#ifndef CHESS_RULE
-#define CHESS_RULE
 
-#include "board.c"
-#include "move.c"
-#include "piece_movement.c"
-#include "make_unmake.c"
+
+#include "chess_rule.h"
 
 
 int in_check(const Board * board,Turn turn){
@@ -75,34 +71,13 @@ void filter_move(Board *board,Movelist * all_move,int turn){
     flag = 0 -> all pseudo-legal move
     flag = 1 -> only legal moves 
 */
-Movelist generate_all(Board *board,Movelist * all_move,Turn turn,int flag){
+Movelist generate_all(Board *board,Movelist * all_move,Turn turn,int filter_legal){
     all_move->size=0;
     int i;
     for(i=0;i<64;i++){
-        /* switch case works because how code for pieces are used */
-        switch (board->brd[i]*turn)
-        {   
-            case 1: 
-                pawn(board,all_move,i);
-                break;
-            case 2: 
-                night(board,all_move,i);
-                break;
-            case 3: 
-                bishop(board,all_move,i);
-                break;
-            case 4: 
-                rook(board,all_move,i);
-                break;
-            case 5: 
-                queen(board,all_move,i);
-                break;
-            case 6: 
-                king(board,all_move,i);
-                break;
-        }
+        generate_move(board,all_move,i,board->brd[i]*turn);
     }
-    if(flag==1) {
+    if(filter_legal==1) {
         filter_move(board,all_move,turn);
     }
     order_moves(all_move);
@@ -131,5 +106,3 @@ int is_gameover(Board * board,Turn turn){
     //stalemate
     return 1; 
 }
-
-#endif

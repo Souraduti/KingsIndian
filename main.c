@@ -3,13 +3,14 @@
 #include <unistd.h>
 #include <time.h>
 
-#include "board.c"
-#include "move.c"
-#include "take_input.c"
-#include "chess_rule.c"
-#include "search.c"
+#include "board.h"
+#include "move.h"
+#include "take_input.h"
+#include "chess_rule.h"
+#include "search.h"
 
-int main(){
+int main()
+{
 
     int choice = 0,first_move=1,count=0;
     time_t t,start,end;
@@ -63,7 +64,7 @@ int main(){
             system("cls");
             display(&board);
             display_move(&move);
-            printf("Position Evaluated %d\n",get_position_evaluated());
+            //printf("Position Evaluated %d\n",get_position_evaluated());
             printf("Time : %0.3lf ms\n",elapsed);
 
         }
@@ -91,7 +92,7 @@ int main(){
             system("cls");
             display(&board);
             display_move(&move);
-            printf("Position Evaluated %d\n",get_position_evaluated());
+            //printf("Position Evaluated %d\n",get_position_evaluated());
             printf("Time : %0.3lf ms\n",elapsed);
         }else if (choice==2){
             while(move.mv==0){

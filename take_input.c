@@ -1,11 +1,5 @@
-#ifndef TAKE_INPUT 
-#define TAKE_INPUT
 
-
-#include "board.c"
-#include "move.c"
-#include "chess_rule.c"
-
+#include "take_input.h"
 
 /* accepts all input in lower case */
 Move user_input(Board * board,const Turn turn){
@@ -106,4 +100,3 @@ Move user_input(Board * board,const Turn turn){
     return user_move;
 }
 
-#endif

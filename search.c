@@ -1,13 +1,6 @@
-#ifndef SEARCH
-#define SEARCH
 
-#include "board.c"
-#include "move.c"
-#include "chess_rule.c"
-#include "static_evaluation.c"
+#include "search.h"
 
-#define MAXDEPTH 5
-#define INF 500000
 
 /*gives a random legal move*/
 Move random_move(Board * board,int turn){
@@ -16,9 +9,7 @@ Move random_move(Board * board,int turn){
     int i = rand()%(movelist.size);
     return movelist.list[i];
 }
-/*
-    evaluate function uses minimax algorithm with alpha-beta pruning
-*/
+
 /*
     the pointer to a varible is passed to successive recursive call
     if the last moved played was illegal (puts the king in danger)
@@ -38,7 +29,7 @@ int evaluate(Board * board,Turn turn,int depth,int* legal,int alpha,int beta){
     best_eval = (-1)*turn*INF;
     generate_all(board,&all_moves,turn,0);
     for(i=0;i<all_moves.size;i++){
-        if(get_captured_piece(&all_moves.list[i])==-6*turn){
+        if(get_captured_piece(&all_moves.list[i])==-King*turn){
             best_eval = turn*INF;
             *legal = 0;
             return best_eval;
@@ -94,9 +85,10 @@ Move computer_move(Board * board,Turn turn){
         /*for Black highest possible value of eval */
         eval = INF;
     }
-    int legal=1,total = piece_count(board);
+    int legal=1;
     generate_all(board,&all_moves,turn,1);
     move = all_moves.list[0];
+
     for(i=0;i<all_moves.size;i++){
         move_on_board(board,&all_moves.list[i]);
         e = evaluate(board,-turn,MAXDEPTH,&legal,-INF,INF);
@@ -118,4 +110,3 @@ Move computer_move(Board * board,Turn turn){
     return move;
 }
 
-#endif
