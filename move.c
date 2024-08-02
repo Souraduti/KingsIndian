@@ -172,3 +172,35 @@ void show_all_moves(const Movelist *moves){
         display_move(&(moves->list[i]));
     }
 }
+int eval_cmp(Move * m1,Move * m2){
+    // it is assumed that both move will be from same side
+    if(get_turn(m1)==White){
+        return m1->eval>=m2->eval?1:0;
+    }else{
+        return m1->eval<=m2->eval?1:0;
+    }
+}
+
+void sort_moves_by_eval(Movelist * movelist){
+    int i,j;
+    Move key;
+    for (i = 1; i < movelist->size; i++) {
+        key = movelist->list[i];
+        j = i - 1;
+        while (j >= 0 && eval_cmp(&movelist->list[j],&key)==0) {
+            movelist->list[j + 1] = movelist->list[j];
+            j = j - 1;
+        }
+        movelist->list[j + 1] = key;
+    }
+}
+
+void remove_illegal_moves(Movelist * moves){
+    int i,j=0;
+    for(i=0;i<moves->size;i++){
+        if(moves->list[i].mv==0) continue;
+        if(i!=j) moves->list[j] = moves->list[i];
+        j++;
+    }
+    moves->size=j;
+}

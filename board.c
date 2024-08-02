@@ -1,10 +1,4 @@
-
 #include "board.h"
-
-
-
-
-
 
 /* sets the pieces on the board in initial configuration */
 void set_board(Board * board)

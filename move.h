@@ -62,5 +62,7 @@ int add_move(Movelist *,Move);
 void clear_movelist(Movelist *);
 void show_all_moves(const Movelist *moves);
 
+void sort_moves_by_eval(Movelist * movelist);
+void remove_illegal_moves(Movelist * moves);
 
 #endif

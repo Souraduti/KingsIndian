@@ -26,8 +26,8 @@ int evaluate(Board * board,Turn turn,int depth,int* legal,int alpha,int beta){
     }
     int i,eval,best_eval,count=0;
     Movelist all_moves;
-    best_eval = (-1)*turn*INF;
     generate_all(board,&all_moves,turn,0);
+    best_eval = (-1)*turn*INF;
     for(i=0;i<all_moves.size;i++){
         if(get_captured_piece(&all_moves.list[i])==-King*turn){
             best_eval = turn*INF;
@@ -35,9 +35,11 @@ int evaluate(Board * board,Turn turn,int depth,int* legal,int alpha,int beta){
             return best_eval;
         }
         int l = 1;
+        if(all_moves.list[i].mv==0) continue;
         move_on_board(board,&all_moves.list[i]);
         eval = evaluate(board,-turn,depth-1,&l,alpha,beta);
         unmove_on_board(board,&all_moves.list[i]);
+        all_moves.list[i].eval = eval;
         if(l==0){
             //the move was illegal
             continue;
@@ -51,8 +53,7 @@ int evaluate(Board * board,Turn turn,int depth,int* legal,int alpha,int beta){
         }
         count++;
         if(beta<=alpha) break;
-    }
-            
+    }    
     if(count==0){
         if(in_check(board,turn)==0){
             //stalemate
@@ -78,6 +79,12 @@ Move computer_move(Board * board,Turn turn){
     }
     Movelist all_moves;
     int i,eval,e;
+    
+    int legal=1;
+    generate_all(board,&all_moves,turn,1);
+    move = all_moves.list[0];
+    int depth;
+    
     if(turn==White){
         /*for White lowest possible value of eval */
         eval = -INF;
@@ -85,14 +92,12 @@ Move computer_move(Board * board,Turn turn){
         /*for Black highest possible value of eval */
         eval = INF;
     }
-    int legal=1;
-    generate_all(board,&all_moves,turn,1);
-    move = all_moves.list[0];
-
     for(i=0;i<all_moves.size;i++){
         move_on_board(board,&all_moves.list[i]);
         e = evaluate(board,-turn,MAXDEPTH,&legal,-INF,INF);
         unmove_on_board(board,&all_moves.list[i]);
+
+        all_moves.list[i].eval = e;
         if(turn==White){
             /*White finds the maximum evaluation*/
             if(e>eval){
@@ -106,7 +111,7 @@ Move computer_move(Board * board,Turn turn){
                 move = all_moves.list[i];
             }
         }
-    }
+    }  
     return move;
 }
 

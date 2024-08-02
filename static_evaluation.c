@@ -164,9 +164,5 @@ int material(const Board *board){
 int static_eval(const Board * board){
     return material(board)+activity(board,is_endgame(board));
 }
-/*int get_position_evaluated(){
-    int temp  = s;
-    s = 0;
-    return temp;
-}*/
+
 

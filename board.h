@@ -1,6 +1,6 @@
 
-#ifndef BOARD_H 
-#define BOARD_H
+#ifndef BOARD 
+#define BOARD
 
 #include <stdio.h>
 

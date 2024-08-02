@@ -65,6 +65,7 @@ void filter_move(Board *board,Movelist * all_move,Turn turn){
     }
     all_move->size = last+1;
 }
+
 /*
     generate all possible moves in a position
     flag = 0 -> all pseudo-legal move
