@@ -22,21 +22,18 @@ int main(int argc,char ** argv)
     //display(&board);
     time_t t;
     srand((unsigned)time(&t));
-    //int count=1;
     Turn player = argv[1][0]=='w'?White:Black;
     while (1)
     {
         Move move;
-        //white move 
         if(is_checkmate(&board,White)==1){
-            fprintf(stdout,"Black Won\n");
+            fprintf(stdout,"end:Black Won\n");
             fflush(stdout);
-            break;
         }else if(is_stalemate(&board,White)){
-            fprintf(stdout,"Draw by Stalemate\n");
+            fprintf(stdout,"end:Draw by Stalemate\n");
             fflush(stdout);
-            break;
         }
+        //white move 
         move.mv = 0;
         if(player==White){
             while(move.mv==0){
@@ -66,17 +63,14 @@ int main(int argc,char ** argv)
             fflush(stdout);
             move_on_board(&board,&move);  
         }
-        
-        //Black move
         if(is_checkmate(&board,Black)==1){
-            fprintf(stdout,"White Won\n");
+            fprintf(stdout,"end:White Won\n");
             fflush(stdout);
-            break;
         }else if(is_stalemate(&board,Black)){
-            fprintf(stdout,"Draw by Stalemate\n");
+            fprintf(stdout,"end:Draw by Stalemate\n");
             fflush(stdout);
-            break;
         }
+        //Black move
         move.mv = 0;
         if(player==Black){
             while(move.mv==0){
@@ -100,7 +94,9 @@ int main(int argc,char ** argv)
                 move = computer_move(&board,Black);
             }
             for(i=0;i<8;i++) res[i] = '\0';
+            fflush(stdout);
             move_to_string(&move,res);
+            fflush(stdout);
             printf("%s",res);
             fflush(stdout);
             move_on_board(&board,&move);  

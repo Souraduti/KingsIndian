@@ -13,25 +13,26 @@ pygame.init()
 WINDOW = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Chess")
 
-def draw_board(win):
+def draw_board(win,side):
     # Colors
     WHITE = (180, 180, 180)
     BLACK = (50, 50, 50)
     win.fill(WHITE)
+    pairity = 1 if side=='b' else 0
     for row in range(8):
         for col in range(8):
-            color = WHITE if (row + col) % 2 == 0 else BLACK
+            color = WHITE if (row + col+pairity) % 2 == 0 else BLACK
             pygame.draw.rect(win, color, (col * SQUARE_SIZE, row * SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE))
 
-def get_square_under_mouse():
+def get_square_under_mouse(side):
     mouse_pos = pygame.mouse.get_pos()
-    file = mouse_pos[0] // SQUARE_SIZE
-    rank = 7 - (mouse_pos[1] // SQUARE_SIZE)
+    file = mouse_pos[0] // SQUARE_SIZE if side == 'w' else (7-mouse_pos[0] // SQUARE_SIZE)
+    rank = 7 - (mouse_pos[1] // SQUARE_SIZE) if side == 'w' else (mouse_pos[1] // SQUARE_SIZE)
     return (rank,file)
 
 def main(process,side):
     Piece.load_images(SQUARE_SIZE)
-    board = Board(SQUARE_SIZE)
+    board = Board(SQUARE_SIZE,side)
     run = True
     selected_square = None
     piece_dragged = None
@@ -48,12 +49,13 @@ def main(process,side):
             if event.type == pygame.QUIT:
                 run = False
             if event.type == pygame.MOUSEBUTTONDOWN:
-                selected_square = get_square_under_mouse()
+                selected_square = get_square_under_mouse(side)
                 piece_dragged = board.piece_at(selected_square)
-                piece_dragged.dragging = True
+                if piece_dragged != None:
+                    piece_dragged.dragging = True
             elif event.type == pygame.MOUSEBUTTONUP:
                 if piece_dragged:
-                    target_square = get_square_under_mouse()
+                    target_square = get_square_under_mouse(side)
                     piece_dragged.dragging = False
                     if board.move(selected_square,target_square,process,last_pressed) :
                         user_moved = True
@@ -66,14 +68,14 @@ def main(process,side):
         
         if piece_dragged:
             piece_dragged.dragging = True
-            draw_board(WINDOW)
+            draw_board(WINDOW,side)
             board.display(WINDOW)
             piece_dragged.dragging = False
             x, y = pygame.mouse.get_pos()
             piece_image = Piece.get_image(piece_dragged.type)
             WINDOW.blit(piece_image, (x - SQUARE_SIZE // 2, y - SQUARE_SIZE // 2))
         else:
-            draw_board(WINDOW)                
+            draw_board(WINDOW,side)                
             board.display(WINDOW)
 
         pygame.display.update()

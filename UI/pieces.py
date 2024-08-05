@@ -7,10 +7,10 @@ class Piece:
         self.file = file
         self.dragging = False
         self.last_moved = False
-    def display(self,win,SQUARE_SIZE):
-        # selected_white = (200,200,200)
-        # selected_black = (70,70,70)
-        cordinate = (self.file*SQUARE_SIZE,(7-self.rank)*SQUARE_SIZE)
+    def display(self,win,SQUARE_SIZE,player_side):
+        file = self.file*SQUARE_SIZE if player_side == 'w' else (7-self.file)*SQUARE_SIZE
+        rank = (7-self.rank)*SQUARE_SIZE if player_side == 'w' else self.rank*SQUARE_SIZE
+        cordinate = (file,rank)
         if not self.dragging:
             win.blit(Piece.images[self.type],cordinate)
     # Load images

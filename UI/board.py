@@ -1,8 +1,10 @@
 from pieces import Piece
 class Board:
-    def __init__(self,SQ_SIZE):
+    def __init__(self,SQ_SIZE,player_side):
+        self.player_side = player_side
         self.pieces = []
         self.SQ_SIZE = SQ_SIZE
+        self.game_end = False
         for f in range(0,8):
             self.pieces.append(Piece('wp',1,f))
             self.pieces.append(Piece('bp',6,f))
@@ -27,7 +29,7 @@ class Board:
     def display(self,win):
         # draw_board(win)
         for piece in self.pieces:
-            piece.display(win,self.SQ_SIZE)
+            piece.display(win,self.SQ_SIZE,self.player_side)
 
     def piece_at(self,position):
         rank,file = position
@@ -107,6 +109,8 @@ class Board:
         p.type = p.type[0]+promoted_piece 
     
     def move(self,src,dest,process,key):
+        if self.game_end:
+            return False
         if src is None or dest is None:
            return False
         if src==dest: return False
@@ -126,18 +130,37 @@ class Board:
         print("Validity : "+validity)
         if validity == 'invalid':
             return False
+        elif validity.startswith('end'):
+            self.game_end = True
+            return False
         self.move_piece(src,dest)
         self.castling(s)
         if promotion:
             self.promote(dest,key)
         elif en_passent:
             self.remove_piece((src[0],dest[1]))
+        # self.check_game_state(process)
         return True
     
+    def check_game_state(self,process):
+        process.stdin.write("fetch")
+        game_state = process.stdout.readline()
+        if game_state.startswith('end'):
+            self.game_end = True
+        print(game_state)
+        extra = process.stdout.readline()
+        print("extra : "+extra)
+        process.stdout.flush()
+
     def get_computer_move(self,process):
+        if self.game_end:
+            return
         print('Waiting')
         computer_move = process.stdout.readline().strip()
         print(f"Computer move: {computer_move}")
+        if computer_move.startswith('end'):
+            self.game_end = True
+            return
         start = self.string_to_sq(computer_move[1:3])
         end =  self.string_to_sq(computer_move[3:6])
         self.move_piece(start,end)
@@ -147,5 +170,6 @@ class Board:
                 self.remove_piece((start[0],end[1]))
             else:
                 self.promote(end,computer_move[5])
+        # self.check_game_state(process)
 
         
