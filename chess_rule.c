@@ -21,22 +21,30 @@ int is_playable(Board *board,Move * move,Turn turn){
     return ch;
 }
 
+int mod(int a){
+    return a<0?-a:a;
+}
+int priority(Move * m){
+    int p = 0;
+    if(is_enpassant(m)) p+=10;
+    else if(is_promotion(m)==1){
+        p+=10;
+        switch(get_promotion(m)){
+            case 1:p+=9;break;
+            case 2:p+=3;break;
+            case 4:p+=5;break;
+            case 8:p+=4;break;
+        }
+    } 
+    else if(is_castling(m,Short)==1||is_castling(m,Long)==1) p+=8;
+    p += 2*mod(get_captured_piece(m)); 
+    p -= mod(get_piece(m));
+    return p;
+}
 int cmp(Move * m1,Move * m2){
-    int8 c1,c2,p1,p2;
-    c1  = get_captured_piece(m1);
-    c2  = get_captured_piece(m2);
-    if(c1<0) c1=-c1;
-    if(c2<0) c2=-c2;
-    if(c1>c2) return 1;
-    if(c1<c2) return 0;
-    if(c1==0&&c2==0) return rand()%2;
-    p1 = get_piece(m1);
-    p2 = get_piece(m2);
-    if(p1<0) p1=-p1;
-    if(p2<0) p2=-p2;
-    if(p1>p2) return 0;
-    if(p1<p2) return 1;
-    return rand()%2;
+    int p1 = priority(m1);
+    int p2 = priority(m2);
+    return p1>=p2?1:0;
 }
 void order_moves(Movelist * movelist){
     int i,j;

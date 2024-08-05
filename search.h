@@ -6,7 +6,7 @@
 #include "chess_rule.h"
 #include "static_evaluation.h"
 
-#define MAXDEPTH 5
+#define MAXDEPTH 3
 #define INF 500000
 
 /*

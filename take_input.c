@@ -100,3 +100,87 @@ Move user_input(Board * board,const Turn turn){
     return user_move;
 }
 
+
+
+Move user_input_from_GUI(Board * board,const Turn turn,char * move){
+    int i; 
+    int8 src,dest;
+    char p = move[0]; 
+    char valid_pieces[6] = {'p','n','b','r','q','k'};
+    char from[2],to[2];
+    Move user_move;
+    Movelist movelist;
+    from[0] = move[1];
+    from[1] = move[2];
+    to[0] = move[3];
+    to[1] = move[4];
+    user_move.mv = 0; 
+    
+    //if(p=='0') exit(1);
+    for(i=0;i<=6;i++){
+        if(i==6){
+            return user_move;
+        }
+        if(p==valid_pieces[i]) break;
+    }
+    
+    if(from[0]<'a'||from[0]>'h'||from[1]<'1'||from[1]>'8'){
+        return user_move;
+    }else{
+        src = (from[0]-'a')+(from[1]-'1')*8;
+    }
+    if(turn==White){
+        p = p+'A'-'a';
+    }
+    if(board->brd[src]!=get_pcode(p)){
+        return user_move;
+    }
+    if(to[0]<'a'||to[0]>'h'||to[1]<'1'||to[1]>'8'){
+        return user_move;
+    }else{
+        dest = (to[0]-'a')+(to[1]-'1')*8;
+    }
+    
+    if((p=='K'&&src==4&&dest==6)||(p=='k'&&src==60&&dest==62)){
+        set_castling(&user_move,Short); 
+    }else if((p=='K'&&src==4&&dest==2)||(p=='k'&&src==60&&dest==58)){
+        set_castling(&user_move,Long); 
+    }
+
+    if((p=='P'||p=='p')&&((src-dest)%8!=0)&&board->brd[dest]==0){
+        //En-passant
+       set_enpassant(&user_move);
+    }
+    if((p=='P'&&to[1]=='8')||(p=='p'&&to[1]=='1')){
+        int ch=0;
+        switch (move[5]){
+            case 'q':ch=1;break;
+            case 'n':ch=2;break;
+            case 'r':ch=3;break;
+            case 'b':ch=4;break;
+        }
+        if(ch<=0||ch>4) {
+            user_move.mv = 0;
+            return user_move;
+        }
+        set_promotion(&user_move,(1<<(ch-1)));
+    }
+    set_piece(&user_move,get_pcode(p));
+    set_source(&user_move,src);
+    set_destination(&user_move,dest);
+    set_captured_piece(&user_move,board->brd[dest]);
+    
+    generate_all(board,&movelist,turn,1);
+    for(i=0;i<=movelist.size;i++){
+        if(i==movelist.size){
+            user_move.mv = 0;
+            break;
+        }
+        if(user_move.mv == movelist.list[i].mv) break;
+    }
+    return user_move;
+}
+
+
+
+

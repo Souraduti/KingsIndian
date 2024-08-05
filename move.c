@@ -90,6 +90,12 @@ void clear_castling(Move * move,Castling_side side){
     int off = 1-side+20;
     move->mv = ~(~(move->mv)|(1<<off));
 }
+int is_promotion(const Move * move){
+    int8 p = get_piece(move);
+    if(p!=1&&p!=-1) return 0;
+    int v = get_promotion(move);
+    return v==0?0:1;
+}
 int get_promotion(const Move * move){
     return (move->mv>>20)&15;
 }
@@ -164,7 +170,47 @@ void display_move(const Move * move){
     if(cpt!='.'){
         printf("capturing %c ",cpt);
     }
+    if(is_promotion(move)){
+        printf("promoting to ");
+        switch(get_promotion(move)){
+            case 1:printf("Queen");  break;
+            case 2:printf("Knight"); break;
+            case 4:printf("Rook");   break;
+            case 8:printf("Bishop"); break;
+        }
+    }
     printf("\n");
+}
+void move_to_string(const  Move * move,char *str_move){
+    char p;
+    int8 src,dst;
+    int prom = 0;
+    p = get_piece_from_code(get_piece(move));
+    p = 'A'<=p&&p<='Z'?p+'a'-'A':p;
+    str_move[0] = p; 
+    src = get_source(move);
+    dst = get_destination(move);
+
+    str_move[1] = src%8+'a';
+    str_move[2] = src/8+'1';
+    str_move[3] = dst%8+'a';
+    str_move[4] = dst/8+'1';
+    str_move[5]= ' ';
+    if(p=='p'){
+        switch(get_promotion(move)){
+            case 1:str_move[5] = 'q';break;
+            case 2:str_move[5] = 'n';break;
+            case 4:str_move[5] = 'b';break;
+            case 8:str_move[5] = 'r';break;
+        }
+    }
+    
+    if(is_enpassant(move)){
+        str_move[5] = 'e';
+    }
+    str_move[6] = ' ';
+    str_move[7] = '\n';
+    
 }
 void show_all_moves(const Movelist *moves){
     int i;
@@ -172,35 +218,7 @@ void show_all_moves(const Movelist *moves){
         display_move(&(moves->list[i]));
     }
 }
-int eval_cmp(Move * m1,Move * m2){
-    // it is assumed that both move will be from same side
-    if(get_turn(m1)==White){
-        return m1->eval>=m2->eval?1:0;
-    }else{
-        return m1->eval<=m2->eval?1:0;
-    }
-}
 
-void sort_moves_by_eval(Movelist * movelist){
-    int i,j;
-    Move key;
-    for (i = 1; i < movelist->size; i++) {
-        key = movelist->list[i];
-        j = i - 1;
-        while (j >= 0 && eval_cmp(&movelist->list[j],&key)==0) {
-            movelist->list[j + 1] = movelist->list[j];
-            j = j - 1;
-        }
-        movelist->list[j + 1] = key;
-    }
-}
 
-void remove_illegal_moves(Movelist * moves){
-    int i,j=0;
-    for(i=0;i<moves->size;i++){
-        if(moves->list[i].mv==0) continue;
-        if(i!=j) moves->list[j] = moves->list[i];
-        j++;
-    }
-    moves->size=j;
-}
+
+

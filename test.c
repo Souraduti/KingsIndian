@@ -9,6 +9,9 @@
 #include "chess_rule.h"
 #include "search.h"
 
+void show_bits(int a);
+void set_board_from2D(Board * board);
+
 int main()
 {
 
@@ -20,18 +23,29 @@ int main()
     Move move;
     Movelist moves;
 
-    set_board(&board);
+    set_board_from2D(&board);
     display(&board);
-    do{
+    //generate_all(&board,&moves,Black,1);
+    //show_all_moves(&moves);
+    move = computer_move(&board,Black);
+    move_on_board(&board,&move);
+    display(&board);
+    display_move(&move);
+    move = user_input(&board,White);
+    move_on_board(&board,&move);
+    display(&board);
+    display_move(&move);
+    /*do{
         printf("Play as \n1.White\n2.Black\n3.Random\n");
         fflush(stdin);
         scanf("%d",&choice);
     }while(choice!=1&&choice!=2&&choice!=3);
     if(choice==3){
         choice = rand()%2+1;
-    }
+    }*/
+    choice = 1;
 
-    while (1)
+    /*while (1)
     {
         //white move 
         if(is_checkmate(&board,White)==1){
@@ -47,7 +61,7 @@ int main()
                 move = user_input(&board,White);
             }
             move_on_board(&board,&move);
-            system("cls");
+            //system("cls");
             display(&board);
         }else if(choice==2){
             start = clock();
@@ -61,13 +75,13 @@ int main()
             elapsed = (end-start)*1000/CLOCKS_PER_SEC;
             total+=elapsed;
             move_on_board(&board,&move);
-            system("cls");
+            //system("cls");
             display(&board);
             display_move(&move);
             //printf("Position Evaluated %d\n",get_position_evaluated());
             printf("Time : %0.3lf ms\n",elapsed);
-
         }
+        show_bits(move.mv);
         //Black move
         if(is_checkmate(&board,Black)==1){
             printf("White Won\n");
@@ -89,7 +103,7 @@ int main()
             elapsed = (end-start)*1000/CLOCKS_PER_SEC;
             total+=elapsed;
             move_on_board(&board,&move);
-            system("cls");
+            //system("cls");
             display(&board);
             display_move(&move);
             //printf("Position Evaluated %d\n",get_position_evaluated());
@@ -99,29 +113,27 @@ int main()
                 move = user_input(&board,Black);
             }
             move_on_board(&board,&move);
-            system("cls");
+            //system("cls");
             display(&board);
         } 
+        show_bits(move.mv);
 		count++;   
-    }
+    }*/
     
     display(&board);
-    printf("Avarage time spend by Computer  : %lf\n",total/count);
-    fflush(stdin);
-    getchar();
     return 0;
 }
 
 void set_board_from2D(Board * board){
     char b[8][8] = {
-                    {'.','.','.','q','k','.','.','.'},
-                    {'.','p','p','p','p','p','p','.'},
+                    {'.','.','.','.','.','.','k','.'},
+                    {'.','p','.','R','.','.','.','.'},
+                    {'.','.','.','.','.','.','N','P'},
+                    {'P','.','.','.','.','.','.','.'},
+                    {'.','P','K','.','.','.','.','.'},
                     {'.','.','.','.','.','.','.','.'},
                     {'.','.','.','.','.','.','.','.'},
-                    {'P','P','P','P','P','P','P','P'},
-                    {'P','P','P','K','P','P','P','P'},
-                    {'P','P','P','P','P','P','P','P'},
-                    {'.','.','.','.','.','.','.','.'},
+                    {'.','.','B','.','.','.','.','.'},
                     };
     set_empty_board(board);
     int i,j;
@@ -136,4 +148,16 @@ void set_board_from2D(Board * board){
             }
         }
     }
+}
+void show_bits(int a){
+    int i;
+    for(i=31;i>=0;i--){
+        int k = a&(1<<i);
+        if(k==0){
+            printf("0");
+        }else{
+            printf("1");
+        }
+    }
+    printf("\n");
 }

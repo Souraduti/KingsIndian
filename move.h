@@ -45,6 +45,7 @@ void set_captured_piece(Move *,int8);
 int is_castling(const Move * move,Castling_side);
 void set_castling(Move * move,Castling_side);
 void clear_castling(Move * move,Castling_side);
+int is_promotion(const Move * move);
 int get_promotion(const Move *);
 void set_promotion(Move *,int);
 int clear_promotion(Move *);
@@ -62,7 +63,6 @@ int add_move(Movelist *,Move);
 void clear_movelist(Movelist *);
 void show_all_moves(const Movelist *moves);
 
-void sort_moves_by_eval(Movelist * movelist);
-void remove_illegal_moves(Movelist * moves);
+void move_to_string(const  Move * move,char *);
 
 #endif
