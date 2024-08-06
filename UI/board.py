@@ -5,6 +5,7 @@ class Board:
         self.pieces = []
         self.SQ_SIZE = SQ_SIZE
         self.game_end = False
+        self.last_moved_square = (-1,-1)
         for f in range(0,8):
             self.pieces.append(Piece('wp',1,f))
             self.pieces.append(Piece('bp',6,f))
@@ -72,6 +73,8 @@ class Board:
                 piece.rank = r2
                 piece.file = f2
                 piece.last_moved = True
+    def get_last_moved_square(self):
+        return self.last_moved_square
     def castling(self,s):
         if s =='ke8g8':
             self.move_piece((7,7),(7,5))
@@ -134,6 +137,7 @@ class Board:
             self.game_end = True
             return False
         self.move_piece(src,dest)
+        self.last_moved_square = dest
         self.castling(s)
         if promotion:
             self.promote(dest,key)
@@ -142,15 +146,15 @@ class Board:
         # self.check_game_state(process)
         return True
     
-    def check_game_state(self,process):
-        process.stdin.write("fetch")
-        game_state = process.stdout.readline()
-        if game_state.startswith('end'):
-            self.game_end = True
-        print(game_state)
-        extra = process.stdout.readline()
-        print("extra : "+extra)
-        process.stdout.flush()
+    # def check_game_state(self,process):
+    #     process.stdin.write("fetch")
+    #     game_state = process.stdout.readline()
+    #     if game_state.startswith('end'):
+    #         self.game_end = True
+    #     print(game_state)
+    #     extra = process.stdout.readline()
+    #     print("extra : "+extra)
+    #     process.stdout.flush()
 
     def get_computer_move(self,process):
         if self.game_end:
@@ -164,6 +168,7 @@ class Board:
         start = self.string_to_sq(computer_move[1:3])
         end =  self.string_to_sq(computer_move[3:6])
         self.move_piece(start,end)
+        self.last_moved_square = end
         self.castling(computer_move)
         if len(computer_move) == 6:
             if computer_move[5]=='e':

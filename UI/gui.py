@@ -4,7 +4,7 @@ import sys
 from pieces import Piece
 from board import Board
 
-WIDTH =  HEIGHT = 640
+WIDTH =  HEIGHT = 400
 SQUARE_SIZE = WIDTH // 8
     
 
@@ -13,7 +13,7 @@ pygame.init()
 WINDOW = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Chess")
 
-def draw_board(win,side):
+def draw_board(win,side,last_moved_square):
     # Colors
     WHITE = (180, 180, 180)
     BLACK = (50, 50, 50)
@@ -22,6 +22,8 @@ def draw_board(win,side):
     for row in range(8):
         for col in range(8):
             color = WHITE if (row + col+pairity) % 2 == 0 else BLACK
+            if (side=='w' and last_moved_square == (7-row,col)) or (side=='b' and last_moved_square == (row,7-col)):
+                color = (128,128,128) if color==BLACK else (108,108,108)
             pygame.draw.rect(win, color, (col * SQUARE_SIZE, row * SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE))
 
 def get_square_under_mouse(side):
@@ -65,17 +67,17 @@ def main(process,side):
                 last_pressed = pygame.key.name(event.key)
 
 
-        
+        last_moved_square = board.get_last_moved_square()
         if piece_dragged:
             piece_dragged.dragging = True
-            draw_board(WINDOW,side)
+            draw_board(WINDOW,side,last_moved_square)
             board.display(WINDOW)
             piece_dragged.dragging = False
             x, y = pygame.mouse.get_pos()
             piece_image = Piece.get_image(piece_dragged.type)
             WINDOW.blit(piece_image, (x - SQUARE_SIZE // 2, y - SQUARE_SIZE // 2))
         else:
-            draw_board(WINDOW,side)                
+            draw_board(WINDOW,side,last_moved_square)                
             board.display(WINDOW)
 
         pygame.display.update()

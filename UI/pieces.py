@@ -6,7 +6,6 @@ class Piece:
         self.rank = rank
         self.file = file
         self.dragging = False
-        self.last_moved = False
     def display(self,win,SQUARE_SIZE,player_side):
         file = self.file*SQUARE_SIZE if player_side == 'w' else (7-self.file)*SQUARE_SIZE
         rank = (7-self.rank)*SQUARE_SIZE if player_side == 'w' else self.rank*SQUARE_SIZE
