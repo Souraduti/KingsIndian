@@ -67,7 +67,7 @@ void enpassant(const Board * board,Movelist * movelist,const int8 sq){
         dst_offset = 40;
     }else{
         side = 1;
-        rank = 5;
+        rank = 3;
         src_offset = 24;
         dst_offset = 16;
     }

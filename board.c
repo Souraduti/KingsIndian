@@ -3,6 +3,7 @@
 /* sets the pieces on the board in initial configuration */
 void set_board(Board * board)
 {
+    board->move_number = 0;
     board->brd[0] = Rook;
     board->brd[1] = Night;
     board->brd[2] = Bishop;

@@ -27,11 +27,19 @@ int main()
     display(&board);
     //generate_all(&board,&moves,Black,1);
     //show_all_moves(&moves);
-    move = computer_move(&board,Black);
+    move = computer_move(&board,White);
     move_on_board(&board,&move);
     display(&board);
     display_move(&move);
-    move = user_input(&board,White);
+    generate_all(&board,&moves,Black,0);
+    for(int i=0;i<moves.size;i++){
+        display_move(&moves.list[i]);
+        show_bits(moves.list[i].mv);
+    }
+    printf("Enter Your move");
+    char input[8];
+    scanf("%s",input);
+    move = user_input_from_GUI(&board,Black,input);
     move_on_board(&board,&move);
     display(&board);
     display_move(&move);
@@ -126,14 +134,14 @@ int main()
 
 void set_board_from2D(Board * board){
     char b[8][8] = {
-                    {'.','.','.','.','.','.','k','.'},
-                    {'.','p','.','R','.','.','.','.'},
-                    {'.','.','.','.','.','.','N','P'},
-                    {'P','.','.','.','.','.','.','.'},
-                    {'.','P','K','.','.','.','.','.'},
+                    {'.','.','.','.','.','.','K','.'},
+                    {'.','p','.','r','.','.','.','.'},
+                    {'p','.','.','.','.','.','n','.'},
+                    {'P','r','k','.','.','.','.','n'},
+                    {'.','.','p','.','.','.','.','.'},
                     {'.','.','.','.','.','.','.','.'},
+                    {'.','P','.','.','.','.','.','.'},
                     {'.','.','.','.','.','.','.','.'},
-                    {'.','.','B','.','.','.','.','.'},
                     };
     set_empty_board(board);
     int i,j;

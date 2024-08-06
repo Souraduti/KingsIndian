@@ -14,7 +14,8 @@ void move_on_board(Board * board,Move* move){
 
     board->brd[dest] = p;
     board->brd[src] = 0;
-    
+    board->move_number++;
+
     store_board_flag(move,board);
 
     //castling
@@ -81,6 +82,7 @@ void unmove_on_board(Board * board,Move* move){
     int8 src = get_source(move);
     Turn turn = get_turn(move);
 
+    board->move_number--;
     board->brd[src] = p;
     board->brd[dest] = get_captured_piece(move);
 

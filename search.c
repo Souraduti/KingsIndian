@@ -84,6 +84,13 @@ Move computer_move(Board * board,Turn turn){
     generate_all(board,&all_moves,turn,1);
     move = all_moves.list[0];
     int depth;
+    if(board->move_number<=10){
+        depth = 3;
+    }else if(board->move_number<=60){
+        depth = 4;
+    }else{
+        depth = 5;
+    }
     
     if(turn==White){
         /*for White lowest possible value of eval */
@@ -94,7 +101,7 @@ Move computer_move(Board * board,Turn turn){
     }
     for(i=0;i<all_moves.size;i++){
         move_on_board(board,&all_moves.list[i]);
-        e = evaluate(board,-turn,MAXDEPTH,&legal,-INF,INF);
+        e = evaluate(board,-turn,depth,&legal,-INF,INF);
         unmove_on_board(board,&all_moves.list[i]);
 
         all_moves.list[i].eval = e;

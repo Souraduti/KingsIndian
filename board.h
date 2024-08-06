@@ -48,6 +48,7 @@ typedef struct Board
 {
     int8 brd[64];
     int flag;
+    int move_number;
 }Board;
 
 void set_board(Board *);
