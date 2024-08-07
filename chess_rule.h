@@ -23,5 +23,6 @@ int in_check(const Board *,Turn);
 int is_checkmate(Board*,Turn);
 int is_stalemate(Board *,Turn);
 int is_gameover(Board *,Turn);
+Game_End_State get_game_state(Board *,Turn);
 
 #endif

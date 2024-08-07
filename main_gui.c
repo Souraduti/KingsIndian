@@ -22,17 +22,18 @@ int main(int argc,char ** argv)
     //display(&board);
     time_t t;
     srand((unsigned)time(&t));
+    int game_state;
     Turn player = argv[1][0]=='w'?White:Black;
     while (1)
     {
         Move move;
-        if(is_checkmate(&board,White)==1){
+        /*if(is_checkmate(&board,White)==1){
             fprintf(stdout,"end:Black Won\n");
             fflush(stdout);
         }else if(is_stalemate(&board,White)){
             fprintf(stdout,"end:Draw by Stalemate\n");
             fflush(stdout);
-        }
+        }*/
         //white move 
         move.mv = 0;
         if(player==White){
@@ -47,8 +48,8 @@ int main(int argc,char ** argv)
                     fflush(stdout);
                 }
             }
-            move_on_board(&board,&move);
             for(i=0;i<8;i++) input[i] = '\0';
+            move_on_board(&board,&move);
         }else{
             if(first_move==1){
                 move = random_move(&board,White);
@@ -63,13 +64,18 @@ int main(int argc,char ** argv)
             fflush(stdout);
             move_on_board(&board,&move);  
         }
-        if(is_checkmate(&board,Black)==1){
+
+        game_state = get_game_state(&board,Black);
+        fprintf(stdout,"%d\n",game_state);
+        fflush(stdout);
+
+        /*if(is_checkmate(&board,Black)==1){
             fprintf(stdout,"end:White Won\n");
             fflush(stdout);
         }else if(is_stalemate(&board,Black)){
             fprintf(stdout,"end:Draw by Stalemate\n");
             fflush(stdout);
-        }
+        }*/
         //Black move
         move.mv = 0;
         if(player==Black){
@@ -94,13 +100,14 @@ int main(int argc,char ** argv)
                 move = computer_move(&board,Black);
             }
             for(i=0;i<8;i++) res[i] = '\0';
-            fflush(stdout);
             move_to_string(&move,res);
-            fflush(stdout);
             printf("%s",res);
             fflush(stdout);
             move_on_board(&board,&move);  
         }
+        game_state = get_game_state(&board,White);
+        fprintf(stdout,"%d\n",game_state);
+        fflush(stdout);
     }
     return 0;
 }

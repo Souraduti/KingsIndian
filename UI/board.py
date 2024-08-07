@@ -1,11 +1,19 @@
 from pieces import Piece
 class Board:
+    WHITE = (180, 180, 180)
+    BLACK = (50, 50, 50)
+    RED = (200,0,0)
+    GREEN = (0,200,0)
+    BLUE = (0,0,200)
+    Last_Move_White = (108,108,108)
+    Last_Move_Black = (128,128,128)
+
     def __init__(self,SQ_SIZE,player_side):
         self.player_side = player_side
         self.pieces = []
         self.SQ_SIZE = SQ_SIZE
-        self.game_end = False
-        self.last_moved_square = (-1,-1)
+        self.game_end = 0
+        self.last_move = [(-1,-1),(-1,-1)]
         for f in range(0,8):
             self.pieces.append(Piece('wp',1,f))
             self.pieces.append(Piece('bp',6,f))
@@ -27,41 +35,33 @@ class Board:
         self.pieces.append(Piece('bn',7,6))
         self.pieces.append(Piece('br',7,7))
 
-    def display(self,win):
-        # draw_board(win)
-        for piece in self.pieces:
-            piece.display(win,self.SQ_SIZE,self.player_side)
-
+    # def display(self,win):
+    #     for piece in self.pieces:
+    #         piece.display(win,self.SQ_SIZE,self.player_side)
     def piece_at(self,position):
         rank,file = position
         for piece in self.pieces:
             if piece.rank == rank and piece.file == file:
                 return piece
         return None
-    
     def to_string(self,sq):
         r,f = sq
         files = "abcdefgh"
-        return files[f]+str(r+1)
-    
+        return files[f]+str(r+1)  
     def string_to_sq(self,s):
-        # print(s)
         file_map = {'a': 0, 'b': 1, 'c': 2, 'd': 3, 'e': 4, 'f': 5, 'g': 6, 'h': 7}
         f = file_map[s[0]]
         r = int(s[1])-1
         return (r,f)
-    
     def get_piece(self,sq):
         for pieces in self.pieces:
             if pieces.rank == sq[0] and pieces.file == sq[1]:
                 return pieces
         return None
     def remove_piece(self,sq):
-        self.pieces = [ piece for piece in self.pieces if piece.rank != sq[0] or piece.file != sq[1] ]
-    
+        self.pieces = [ piece for piece in self.pieces if piece.rank != sq[0] or piece.file != sq[1] ]    
     def move_to_string(self,src,dst):
         return self.get_piece(src).type[1]+self.to_string(src)+self.to_string(dst)
-    
     def move_piece(self,src,dest):
         if src and dest:
             r1,f1 = src
@@ -73,8 +73,6 @@ class Board:
                 piece.rank = r2
                 piece.file = f2
                 piece.last_moved = True
-    def get_last_moved_square(self):
-        return self.last_moved_square
     def castling(self,s):
         if s =='ke8g8':
             self.move_piece((7,7),(7,5))
@@ -104,19 +102,27 @@ class Board:
         if src[0]==dest[0]:
             return False
         return True
-
     def promote(self,sq,promoted_piece):
         p = self.get_piece(sq)
         if p==None:
             return
         p.type = p.type[0]+promoted_piece 
-    
+    def is_square_valid(self,sq):
+        if sq[0]<0 or sq[0]>=8:
+            return False
+        if sq[1]<0 or sq[1]>=8:
+            return False
+        return True
     def move(self,src,dest,process,key):
-        if self.game_end:
+        if self.game_end!=0:
             return False
         if src is None or dest is None:
            return False
         if src==dest: return False
+        if not self.is_square_valid(src):
+            return False
+        if not self.is_square_valid(dest):
+            return False
         s = self.move_to_string(src,dest)
         promotion = self.is_promotion(src,dest)
         en_passent = self.is_enpassent(src,dest)
@@ -133,48 +139,83 @@ class Board:
         print("Validity : "+validity)
         if validity == 'invalid':
             return False
-        elif validity.startswith('end'):
-            self.game_end = True
-            return False
         self.move_piece(src,dest)
-        self.last_moved_square = dest
+        self.last_move = [src,dest]
         self.castling(s)
         if promotion:
             self.promote(dest,key)
         elif en_passent:
             self.remove_piece((src[0],dest[1]))
-        # self.check_game_state(process)
+        self.check_game_state(process)
         return True
-    
-    # def check_game_state(self,process):
-    #     process.stdin.write("fetch")
-    #     game_state = process.stdout.readline()
-    #     if game_state.startswith('end'):
-    #         self.game_end = True
-    #     print(game_state)
-    #     extra = process.stdout.readline()
-    #     print("extra : "+extra)
-    #     process.stdout.flush()
 
     def get_computer_move(self,process):
-        if self.game_end:
+        if self.game_end!=0:
             return
         print('Waiting')
         computer_move = process.stdout.readline().strip()
         print(f"Computer move: {computer_move}")
-        if computer_move.startswith('end'):
-            self.game_end = True
-            return
         start = self.string_to_sq(computer_move[1:3])
         end =  self.string_to_sq(computer_move[3:6])
         self.move_piece(start,end)
-        self.last_moved_square = end
+        self.last_move = [start,end]
         self.castling(computer_move)
         if len(computer_move) == 6:
             if computer_move[5]=='e':
                 self.remove_piece((start[0],end[1]))
             else:
                 self.promote(end,computer_move[5])
-        # self.check_game_state(process)
+        self.check_game_state(process)
+    
+    def check_game_state(self,process):
+        print("waiting for game state ")
+        state = process.stdout.readline().strip()
+        print("game state "+state)
+        try:
+            self.game_end = int(state)
+        except:
+            self.game_end = 0
+    def adjust_sq(self,sq):
+        if self.player_side == 'w':
+            return (7-sq[0],sq[1])
+        else:
+            return (sq[0],7-sq[1])
 
-        
+    def get_color(self,row,col):
+        pairity = 1 if self.player_side=='b' else 0
+        sq = self.adjust_sq((row,col))
+        p = self.piece_at(sq)
+        if sq in self.last_move:
+            color = Board.Last_Move_White if (row + col+pairity) % 2 == 0 else Board.Last_Move_Black
+        else:
+            color = Board.WHITE if (row + col+pairity) % 2 == 0 else Board.BLACK
+        if self.game_end==0 or p==None:
+            return color
+        if self.game_end == 1:
+            #White Won
+            if p.type =='wk': 
+                color = Board.GREEN
+            elif p.type == 'bk':
+                color = Board.RED
+        elif self.game_end == 2:
+            #Black Won
+            if p.type =='bk': 
+                color = Board.GREEN
+            elif p.type == 'wk':
+                color = Board.RED
+        else:
+            #Draw
+            if p.type =='wk' or p.type =='bk':
+                color = Board.BLUE
+        return color
+    
+    def draw_board(self,win,pygame):
+        win.fill(Board.WHITE)
+        for row in range(8):
+            for col in range(8):
+                color = self.get_color(row,col)
+                pygame.draw.rect(win, color, (col * self.SQ_SIZE, row * self.SQ_SIZE, self.SQ_SIZE, self.SQ_SIZE))
+        for piece in self.pieces:
+            piece.display(win,self.SQ_SIZE,self.player_side)
+
+            

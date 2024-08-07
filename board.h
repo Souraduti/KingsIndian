@@ -29,6 +29,15 @@ typedef enum Castling_side{
     Long = 0
 }Castling_side;
 
+typedef enum Game_End_State{
+    ON = 0,
+    White_Won = 1,
+    Black_Won = 2,
+    Draw_Stalemate = 3,
+    Draw_Insufficient = 4,
+    Draw_Repetition = 5
+}Game_End_State;
+
 
 /*
     Board Representation :
