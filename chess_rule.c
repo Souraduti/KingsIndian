@@ -104,16 +104,7 @@ int is_stalemate(Board * board,Turn turn){
     return (moves.size==0)?1:0;
 }
 
-int is_gameover(Board * board,Turn turn){
-    int cheked = in_check(board,turn);
-    Movelist moves;
-    generate_all(board,&moves,turn,1);
-    if(moves.size!=0) return 0;
-    //checkmate
-    if(cheked==1) return -1; 
-    //stalemate
-    return 1; 
-}
+
 int is_insufficient(Board *board){
     int i;
     int minor_pieces[4] = {0,0,0,0};
@@ -135,14 +126,14 @@ int is_insufficient(Board *board){
         //2 or less nights and no bishop
         if(minor_pieces[1]<=2&&minor_pieces[3]==0) return 1;
         //total minor pieces at least 2 
-        if((minor_pieces[1]+minor_pieces[3])>=2) return 0;
+        return (minor_pieces[1]+minor_pieces[3])>=2?0:1;
     }
     if(minor_pieces[1]==0&&minor_pieces[3]==0){
         // Black with lone king
         //2 or less nights and no bishop
         if(minor_pieces[0]<=2&&minor_pieces[2]==0) return 1;
         //total minor pieces at least 2 
-        if((minor_pieces[0]+minor_pieces[2])>=2) return 0;
+        return (minor_pieces[0]+minor_pieces[2])>=2?0:1;
     }
     return 0;
 }

@@ -25,9 +25,11 @@ int main()
 
     set_board_from2D(&board);
     display(&board);
+    int a = is_insufficient(&board);
+    printf("a = %d\n",a);
     //generate_all(&board,&moves,Black,1);
     //show_all_moves(&moves);
-    move = computer_move(&board,White);
+    /*move = computer_move(&board,White);
     move_on_board(&board,&move);
     display(&board);
     display_move(&move);
@@ -135,12 +137,12 @@ int main()
 void set_board_from2D(Board * board){
     char b[8][8] = {
                     {'.','.','.','.','.','.','K','.'},
-                    {'.','p','.','r','.','.','.','.'},
-                    {'p','.','.','.','.','.','n','.'},
-                    {'P','r','k','.','.','.','.','n'},
-                    {'.','.','p','.','.','.','.','.'},
                     {'.','.','.','.','.','.','.','.'},
-                    {'.','P','.','.','.','.','.','.'},
+                    {'.','.','.','.','.','.','.','.'},
+                    {'.','.','k','.','.','.','.','.'},
+                    {'.','.','.','.','.','.','.','.'},
+                    {'.','.','.','.','.','.','.','.'},
+                    {'.','.','.','.','.','.','.','.'},
                     {'.','.','.','.','.','.','.','.'},
                     };
     set_empty_board(board);

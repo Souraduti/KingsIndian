@@ -1,6 +1,14 @@
 
 #include "take_input.h"
 
+/*
+    following two functions are for taking move input from user
+    formating the move in the game representation
+    and validating the moves are actually legal in that position or not
+    the first funtion takes input from console and the second one for GUI 
+*/
+
+
 /* accepts all input in lower case */
 Move user_input(Board * board,const Turn turn){
     int i; 

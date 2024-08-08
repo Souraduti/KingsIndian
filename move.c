@@ -116,6 +116,12 @@ void set_enpassant(Move * move){
 void clear_enpassant(Move * move){
     move->mv = ~(~(move->mv)|(1<<24));
 }
+
+
+/*
+    the board flags indicating castling rights,pawn jumps
+    are stored in move so that they can be retrived while unmaking the move
+ */
 void store_board_flag(Move * move,Board * board){
     Turn turn = get_turn(move);
     if(get_castling_right(board,turn,Short)==1){
@@ -132,6 +138,9 @@ void store_board_flag(Move * move,Board * board){
         move->mv = move->mv|(1<<31);
     }
 }
+/*
+    returns the stored board flags to the board
+*/
 void restore_board_flag(Move * move,Board * board){
     Turn turn = get_turn(move);
     int file = (move->mv>>27)&15;

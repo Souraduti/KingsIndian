@@ -3,7 +3,14 @@
 #include "make_unmake.h"
 
 /*
-    makes a move on board . moves the appropiate pieces to proper squares
+    void move_on_board(Board * board,Move* move):
+        makes a move on board . 
+        moves the appropiate pieces to proper squares
+        updates the board flags
+        handles specials moves like castling,en-passant,pawn promotion
+    void unmove_on_board(Board * board,Move* move):
+        reverses every operetion of previous function
+    Applying this two functions does not changes the state of the board
 */
 void move_on_board(Board * board,Move* move){
 

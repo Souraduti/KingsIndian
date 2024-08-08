@@ -6,6 +6,11 @@
 Move random_move(Board * board,int turn){
     Movelist movelist;
     generate_all(board,&movelist,turn,1);
+    if(movelist.size==0){
+        Move move;
+        move.mv = 0;
+        return move;
+    }
     int i = rand()%(movelist.size);
     return movelist.list[i];
 }
@@ -24,6 +29,10 @@ int evaluate(Board * board,Turn turn,int depth,int* legal,int alpha,int beta){
     if(depth==0){
         return static_eval(board);
     }
+    if(is_insufficient(board)){
+        // draw by insufficient material
+        return 0;
+    }
     int i,eval,best_eval,count=0;
     Movelist all_moves;
     generate_all(board,&all_moves,turn,0);
@@ -39,7 +48,6 @@ int evaluate(Board * board,Turn turn,int depth,int* legal,int alpha,int beta){
         move_on_board(board,&all_moves.list[i]);
         eval = evaluate(board,-turn,depth-1,&l,alpha,beta);
         unmove_on_board(board,&all_moves.list[i]);
-        all_moves.list[i].eval = eval;
         if(l==0){
             //the move was illegal
             continue;
@@ -67,23 +75,16 @@ int evaluate(Board * board,Turn turn,int depth,int* legal,int alpha,int beta){
 }
 Move computer_move(Board * board,Turn turn){
     Move move;
-    int g = is_gameover(board,turn);
-    if(g==-1){
-        //Checkmate
-        move.mv = -1;
-        return move;
-    }else if(g==1){
-        //Stalemate
-        move.mv = 0;
+    move.mv = 0;
+    if(get_game_state(board,turn)!=ON){
         return move;
     }
-    Movelist all_moves;
-    int i,eval,e;
+    int i,eval,e,legal=1,depth;
     
-    int legal=1;
+    Movelist all_moves;
     generate_all(board,&all_moves,turn,1);
-    move = all_moves.list[0];
-    int depth;
+
+    /*Adjusting depth of search for different phases of the game*/
     if(board->move_number<=10){
         depth = 3;
     }else if(board->move_number<=60){
@@ -104,7 +105,6 @@ Move computer_move(Board * board,Turn turn){
         e = evaluate(board,-turn,depth,&legal,-INF,INF);
         unmove_on_board(board,&all_moves.list[i]);
 
-        all_moves.list[i].eval = e;
         if(turn==White){
             /*White finds the maximum evaluation*/
             if(e>eval){

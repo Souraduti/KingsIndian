@@ -1,6 +1,4 @@
 #include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
 #include <time.h>
 
 #include "board.h"
@@ -9,6 +7,10 @@
 #include "chess_rule.h"
 #include "search.h"
 
+
+/*
+    This function is for playing game on Console
+ */
 int main()
 {
 
@@ -18,7 +20,7 @@ int main()
     srand((unsigned)time(&t));
     Board board;
     Move move;
-    Movelist moves;
+    Game_End_State game_state = ON;
 
     set_board(&board);
     display(&board);
@@ -31,16 +33,9 @@ int main()
         choice = rand()%2+1;
     }
 
-    while (1)
+    while (game_state==ON)
     {
         //white move 
-        if(is_checkmate(&board,White)==1){
-            printf("Black Won\n");
-            break;
-        }else if(is_stalemate(&board,White)){
-            printf("Draw by Stalemate\n");
-            break;
-        }
         move.mv = 0;
         if(choice==1){
             while(move.mv==0){
@@ -64,18 +59,11 @@ int main()
             system("cls");
             display(&board);
             display_move(&move);
-            //printf("Position Evaluated %d\n",get_position_evaluated());
             printf("Time : %0.3lf ms\n",elapsed);
-
         }
+        game_state = get_game_state(&board,Black);
+        if(game_state!=ON) break;
         //Black move
-        if(is_checkmate(&board,Black)==1){
-            printf("White Won\n");
-            break;
-        }else if(is_stalemate(&board,Black)){
-            printf("Draw by Stalemate\n");
-            break;
-        }
         move.mv = 0;
         if(choice==1){
             start = clock();
@@ -92,7 +80,6 @@ int main()
             system("cls");
             display(&board);
             display_move(&move);
-            //printf("Position Evaluated %d\n",get_position_evaluated());
             printf("Time : %0.3lf ms\n",elapsed);
         }else if (choice==2){
             while(move.mv==0){
@@ -101,11 +88,21 @@ int main()
             move_on_board(&board,&move);
             system("cls");
             display(&board);
-        } 
-		count++;   
+        }
+        game_state = get_game_state(&board,White);
+        if(game_state!=ON) break;  
     }
-    
+    char * str;
+    switch(game_state){
+        case ON:str = "game-on";break;
+        case White_Won:str = "White Won";break;
+        case Black_Won:str = "Black Won";break;
+        case Draw_Stalemate:str = "Draw by Stalemate";break;
+        case Draw_Repetition:str = "Draw by Repitition";break;
+        case Draw_Insufficient:str = "Draw by Insufficient Material";break;
+    }
     display(&board);
+    printf("Game Result : %s\n",str);
     printf("Avarage time spend by Computer  : %lf\n",total/count);
     fflush(stdin);
     getchar();

@@ -274,11 +274,11 @@ void castling(const Board * board,Movelist * movelist,Turn turn){
     out1:
     //long
     if(get_castling_right(board,turn,Long)==1){
-        if(board->brd[k]!=turn*6) goto out2;
-        if(board->brd[k-1]!=0) goto out2;
-        if(board->brd[k-2]!=0) goto out2;
-        if(board->brd[k-3]!=0) goto out2;
-        if(board->brd[k-4]!=turn*4) goto out2;
+        if(board->brd[k]!=turn*King) goto out2;
+        if(board->brd[k-1]!=Empty) goto out2;
+        if(board->brd[k-2]!=Empty) goto out2;
+        if(board->brd[k-3]!=Empty) goto out2;
+        if(board->brd[k-4]!=turn*Rook) goto out2;
         if(is_opponent_controls(board,k,turn)==1) goto out2;
         if(is_opponent_controls(board,k-1,turn)==1) goto out2;
         if(is_opponent_controls(board,k-2,turn)==1) goto out2;

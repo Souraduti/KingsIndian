@@ -4,7 +4,7 @@ import sys
 from pieces import Piece
 from board import Board
 
-WIDTH =  HEIGHT = 512
+WIDTH =  HEIGHT = 640
 SQUARE_SIZE = WIDTH // 8
     
 
@@ -55,14 +55,13 @@ def main(process,side):
         if piece_dragged:
             piece_dragged.dragging = True
             board.draw_board(WINDOW,pygame)
-            # board.display(WINDOW)
+
             piece_dragged.dragging = False
             x, y = pygame.mouse.get_pos()
             piece_image = Piece.get_image(piece_dragged.type)
             WINDOW.blit(piece_image, (x - SQUARE_SIZE // 2, y - SQUARE_SIZE // 2))
         else:
             board.draw_board(WINDOW,pygame)                
-            # board.display(WINDOW)
 
         pygame.display.update()
     pygame.quit()
@@ -78,7 +77,8 @@ if __name__ == "__main__":
         print('Enter b for playing black')
         sys.exit(1)
     try:
-        process = subprocess.Popen(['E:\Git\KingsIndian\KingsIndian\main_gui',side], stdin=subprocess.PIPE,stdout=subprocess.PIPE, text=True)       
+        path = 'E:\Git\KingsIndian\KingsIndian\main_gui'
+        process = subprocess.Popen([path,side], stdin=subprocess.PIPE,stdout=subprocess.PIPE, text=True)       
         main(process,side)
     finally:
         process.terminate()

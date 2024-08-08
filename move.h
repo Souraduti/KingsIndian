@@ -18,9 +18,13 @@
 
 typedef struct Move{
     int mv;
-    int eval;
 }Move;
 
+
+/*
+    Highest number of moves possible is 218
+    But for practical cases size 128 will suffice
+*/
 #define LIST_LENGTH 128
 
 typedef struct Movelist{
