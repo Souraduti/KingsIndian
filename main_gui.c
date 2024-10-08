@@ -21,11 +21,12 @@ int main(int argc,char ** argv)
     char input[8],res[8];
     Board board;
     
-    set_board(&board);
     time_t t;
     srand((unsigned)time(&t));
     int game_state=0;
     Turn player = argv[1][0]=='w'?White:Black;
+    char * fen = argv[2];
+    set_board_fen(&board,fen);
     while (game_state==0)
     {
         //white move 

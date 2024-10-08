@@ -12,7 +12,7 @@
 void show_bits(int a);
 void set_board_from2D(Board * board);
 
-int main()
+int main(int argc,char ** argv)
 {
 
     int choice = 0,first_move=0,count=0;
@@ -22,11 +22,10 @@ int main()
     Board board;
     Move move;
     Movelist moves;
-
-    set_board_from2D(&board);
+    char * fen = argv[1];
+    printf("Fen = %s\n",fen);
+    set_board_fen(&board,fen);
     display(&board);
-    int a = is_insufficient(&board);
-    printf("a = %d\n",a);
     //generate_all(&board,&moves,Black,1);
     //show_all_moves(&moves);
     /*move = computer_move(&board,White);
@@ -130,7 +129,7 @@ int main()
 		count++;   
     }*/
     
-    display(&board);
+    // display(&board);
     return 0;
 }
 

@@ -1,6 +1,7 @@
 import pygame
 import subprocess
 import sys
+import random
 from pieces import Piece
 from board import Board
 
@@ -14,12 +15,12 @@ def get_square_under_mouse(side):
     rank = 7 - (mouse_pos[1] // SQUARE_SIZE) if side == 'w' else (mouse_pos[1] // SQUARE_SIZE)
     return (rank,file)
 
-def main(process,side):
+def main(process,side,fen):
     pygame.init()
     WINDOW = pygame.display.set_mode((WIDTH, HEIGHT))
     pygame.display.set_caption("Chess")
     Piece.load_images(SQUARE_SIZE)
-    board = Board(SQUARE_SIZE,side)
+    board = Board(SQUARE_SIZE,side,fen)
     run = True
     selected_square = None
     piece_dragged = None
@@ -68,17 +69,19 @@ def main(process,side):
     process.terminate()
 
 if __name__ == "__main__":
-    if len(sys.argv)<2:
-        print("Choose Side ")
-        sys.exit(1)
-    side = sys.argv[1]
+    side = random.choice(['w','b'])
+    fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR"
+    if len(sys.argv)>=2:
+        side = sys.argv[1]
+    if len(sys.argv)>=3:
+        fen = sys.argv[2]
     if side not in ['w','b']:
         print('Enter w for playing white')
         print('Enter b for playing black')
         sys.exit(1)
     try:
         path = 'E:\Git\KingsIndian\KingsIndian\main_gui'
-        process = subprocess.Popen([path,side], stdin=subprocess.PIPE,stdout=subprocess.PIPE, text=True)       
-        main(process,side)
+        process = subprocess.Popen([path,side,fen], stdin=subprocess.PIPE,stdout=subprocess.PIPE, text=True)       
+        main(process,side,fen)
     finally:
         process.terminate()

@@ -8,32 +8,32 @@ class Board:
     Last_Move_White = (108,108,108)
     Last_Move_Black = (128,128,128)
 
-    def __init__(self,SQ_SIZE,player_side):
+    def __init__(self,SQ_SIZE,player_side,fen):
         self.player_side = player_side
         self.pieces = []
         self.SQ_SIZE = SQ_SIZE
         self.game_end = 0
         self.last_move = [(-1,-1),(-1,-1)]
-        for f in range(0,8):
-            self.pieces.append(Piece('wp',1,f))
-            self.pieces.append(Piece('bp',6,f))
-        self.pieces.append(Piece('wr',0,0))
-        self.pieces.append(Piece('wn',0,1))
-        self.pieces.append(Piece('wb',0,2))
-        self.pieces.append(Piece('wq',0,3))
-        self.pieces.append(Piece('wk',0,4))
-        self.pieces.append(Piece('wb',0,5))
-        self.pieces.append(Piece('wn',0,6))
-        self.pieces.append(Piece('wr',0,7))
-
-        self.pieces.append(Piece('br',7,0))
-        self.pieces.append(Piece('bn',7,1))
-        self.pieces.append(Piece('bb',7,2))
-        self.pieces.append(Piece('bq',7,3))
-        self.pieces.append(Piece('bk',7,4))
-        self.pieces.append(Piece('bb',7,5))
-        self.pieces.append(Piece('bn',7,6))
-        self.pieces.append(Piece('br',7,7))
+        self.parse_fen(fen)
+        
+    def parse_fen(self,fen):
+        ranks = fen.split("/")
+        i = 7
+        for rank in ranks:
+            j = 0
+            for c in rank:
+                if c.isnumeric():
+                    j+=int(c)
+                else:
+                    self.pieces.append(Piece(Board.format_piece(c),i,j))
+                    j+=1
+            i -= 1
+    def format_piece(c):
+        if c in ['K','Q','R','B','N','P']:
+            return 'w'+c.lower()
+        else:
+            c in ['k','q','r','b','n','p']
+            return 'b'+c
 
     # def display(self,win):
     #     for piece in self.pieces:

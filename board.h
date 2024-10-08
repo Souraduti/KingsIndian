@@ -3,6 +3,7 @@
 #define BOARD
 
 #include <stdio.h>
+#include <string.h>
 
 /*
   Pieces Representation
@@ -62,6 +63,8 @@ typedef struct Board
 
 void set_board(Board *);
 void set_empty_board(Board *);
+void set_board_fen(Board *,const char*);
+
 char get_piece_from_code(int8);
 int8 get_pcode(char p);
 void  display(const Board *);
