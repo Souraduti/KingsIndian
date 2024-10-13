@@ -21,21 +21,29 @@ int main(int argc,char ** argv)
     char input[8],res[8];
     Board board;
     
-    time_t t;
-    srand((unsigned)time(&t));
+    time_t time_;
+    srand((unsigned)time(&time_));
     int game_state=0;
     Turn player = argv[1][0]=='w'?White:Black;
     char * fen = argv[2];
-    set_board_fen(&board,fen);
+    char t = argv[3][0];
+    set_board_fen(&board,fen,t);
     while (game_state==0)
-    {
-        //white move 
+    { 
         Move move;
         move.mv = 0;
-        if(player==White){
+        int depth;
+        if(board.move_number<=10){
+            depth = 3;
+        }else if(board.move_number<=60){
+            depth = 4;
+        }else{
+            depth = 5;
+        }
+        if(player==board.turn){
             while(move.mv==0){
                 scanf("%s",input);
-                move = user_input_from_GUI(&board,White,input);
+                move = user_input_from_GUI(&board,get_next_turn(&board),input);
                 if(move.mv==0){
                     printf("invalid\n");
                     fflush(stdout);
@@ -48,10 +56,10 @@ int main(int argc,char ** argv)
             move_on_board(&board,&move);
         }else{
             if(first_move==1){
-                move = random_move(&board,White);
+                move = random_move(&board,get_next_turn(&board));
                 first_move = 0;
             }else{
-                move = computer_move(&board,White);
+                move = computer_move(&board,get_next_turn(&board),depth);
             }
 
             for(i=0;i<8;i++) res[i] = '\0';
@@ -60,42 +68,42 @@ int main(int argc,char ** argv)
             fflush(stdout);
             move_on_board(&board,&move);  
         }
-        game_state = get_game_state(&board,Black);
+        game_state = get_game_state(&board,get_next_turn(&board));
         printf("%d\n",game_state);
         fflush(stdout);
 
         //Black move
-        move.mv = 0;
-        if(player==Black){
-            while(move.mv==0){
-                scanf("%s",input);
-                move = user_input_from_GUI(&board,Black,input);
-                if(move.mv==0){
-                    printf("invalid\n");
-                    fflush(stdout);
-                }else{
-                    printf("valid\n");
-                    fflush(stdout);
-                }
-            }
-            move_on_board(&board,&move);
-            for(i=0;i<8;i++) input[i] = '\0';
-        }else{
-            if(first_move==1){
-                move = random_move(&board,Black);
-                first_move = 0;
-            }else{
-                move = computer_move(&board,Black);
-            }
-            for(i=0;i<8;i++) res[i] = '\0';
-            move_to_string(&move,res);
-            printf("%s",res);
-            fflush(stdout);
-            move_on_board(&board,&move);  
-        }
-        game_state = get_game_state(&board,White);
-        printf("%d\n",game_state);
-        fflush(stdout);
+        // move.mv = 0;
+        // if(player==board.turn){
+        //     while(move.mv==0){
+        //         scanf("%s",input);
+        //         move = user_input_from_GUI(&board,get_next_turn(&board),input);
+        //         if(move.mv==0){
+        //             printf("invalid\n");
+        //             fflush(stdout);
+        //         }else{
+        //             printf("valid\n");
+        //             fflush(stdout);
+        //         }
+        //     }
+        //     move_on_board(&board,&move);
+        //     for(i=0;i<8;i++) input[i] = '\0';
+        // }else{
+        //     if(first_move==1){
+        //         move = random_move(&board,get_next_turn(&board));
+        //         // first_move = 0;
+        //     }else{
+        //         move = computer_move(&board,get_next_turn(&board));
+        //     }
+        //     for(i=0;i<8;i++) res[i] = '\0';
+        //     move_to_string(&move,res);
+        //     printf("%s",res);
+        //     fflush(stdout);
+        //     move_on_board(&board,&move);  
+        // }
+        // game_state = get_game_state(&board,White);
+        // printf("%d\n",game_state);
+        // fflush(stdout);
     }
     return 0;
 }

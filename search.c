@@ -73,26 +73,17 @@ int evaluate(Board * board,Turn turn,int depth,int* legal,int alpha,int beta){
     }
     return best_eval;
 }
-Move computer_move(Board * board,Turn turn){
+Move computer_move(Board * board,Turn turn,int depth){
     Move move;
     move.mv = 0;
     if(get_game_state(board,turn)!=ON){
         return move;
     }
-    int i,eval,e,legal=1,depth;
+    int i,eval,e,legal=1;
     
     Movelist all_moves;
     generate_all(board,&all_moves,turn,1);
-
-    /*Adjusting depth of search for different phases of the game*/
-    if(board->move_number<=10){
-        depth = 3;
-    }else if(board->move_number<=60){
-        depth = 4;
-    }else{
-        depth = 5;
-    }
-    
+        
     if(turn==White){
         /*for White lowest possible value of eval */
         eval = -INF;

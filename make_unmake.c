@@ -78,6 +78,7 @@ void move_on_board(Board * board,Move* move){
         set_castling_right(board,turn,Long,0);
     }
 
+    board->turn *= -1;
 }
 
 /*
@@ -122,7 +123,7 @@ void unmove_on_board(Board * board,Move* move){
     if(p==King*turn){
         set_king_pos(board,turn,src);
     }
-
+    board->turn *= -1;
 }
 
 

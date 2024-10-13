@@ -57,16 +57,18 @@ typedef char int8;
 typedef struct Board
 {
     int8 brd[64];
+    Turn turn;
     int flag;
     int move_number;
 }Board;
 
 void set_board(Board *);
 void set_empty_board(Board *);
-void set_board_fen(Board *,const char*);
+void set_board_fen(Board *,const char*,char);
 
 char get_piece_from_code(int8);
 int8 get_pcode(char p);
+Turn get_next_turn(Board *);
 void  display(const Board *);
 int8 get_king_pos(const Board *,Turn);
 void set_king_pos(Board *,Turn,int8);

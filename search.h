@@ -13,7 +13,7 @@
     evaluate function uses minimax algorithm with alpha-beta pruning
 */
 int evaluate(Board * board,Turn turn,int depth,int* legal,int alpha,int beta);
-Move computer_move(Board * board,Turn turn);
+Move computer_move(Board * board,Turn turn,int depth);
 Move random_move(Board * board,int turn);
 
 #endif

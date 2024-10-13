@@ -37,6 +37,7 @@ void set_board(Board * board)
     }
     /* 984304 in binary => 000000000000011110000010011110000*/
     board->flag = 984304;
+    board->turn = White;
 }
 
 /* sets an Empty Board */
@@ -47,6 +48,7 @@ void set_empty_board(Board * board)
         board->brd[i] = 0;
     }
     board->flag = 0;
+    board->turn = White;
 }
 
 int validate_fen(const char * fen){
@@ -88,7 +90,7 @@ int validate_fen(const char * fen){
 
     return 1;
 }
-void set_board_fen(Board * board,const char * fen){
+void set_board_fen(Board * board,const char * fen,char t){
     int i,j,k=0;
     //if fen is invalid set up the standerd pieces
     if(validate_fen(fen)==0){
@@ -97,6 +99,7 @@ void set_board_fen(Board * board,const char * fen){
         return;
     }
     set_empty_board(board);
+    board->turn = (t=='b')?Black:White;
     for(i=56;i>=0;i-=8){
         j = 0;
         while(!(i==0&&j>=8)){
@@ -108,8 +111,6 @@ void set_board_fen(Board * board,const char * fen){
             if('1'<=ch&&ch<='8'){
                 j+= ch-'0';
             }else {
-                // printf("piece = %c\n",ch);
-                // printf("i = %d j = %d \n",i,j);
                 board->brd[i+j] = get_pcode(ch);
                 j++;
                 if(ch=='K') set_king_pos(board,White,i+j);
@@ -117,6 +118,11 @@ void set_board_fen(Board * board,const char * fen){
             }
         }
     }
+    board->move_number = 0;
+    set_castling_right(board,White,Short,1);
+    set_castling_right(board,White,Long,1);
+    set_castling_right(board,Black,Short,1);
+    set_castling_right(board,Black,Long,1);
 }
 
 char get_piece_from_code(int8 p_code){
@@ -209,6 +215,10 @@ void set_castling_right(Board * board ,Turn turn,Castling_side side,int v)
     }else if(v==1){
         board->flag|=(1<<off);
     }
+}
+
+Turn get_next_turn(Board * board){
+    return board->turn;
 }
 
 
