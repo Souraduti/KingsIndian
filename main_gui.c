@@ -13,7 +13,6 @@
  */
 
 
-
 int main(int argc,char ** argv)
 {
     int i;
@@ -71,39 +70,6 @@ int main(int argc,char ** argv)
         game_state = get_game_state(&board,get_next_turn(&board));
         printf("%d\n",game_state);
         fflush(stdout);
-
-        //Black move
-        // move.mv = 0;
-        // if(player==board.turn){
-        //     while(move.mv==0){
-        //         scanf("%s",input);
-        //         move = user_input_from_GUI(&board,get_next_turn(&board),input);
-        //         if(move.mv==0){
-        //             printf("invalid\n");
-        //             fflush(stdout);
-        //         }else{
-        //             printf("valid\n");
-        //             fflush(stdout);
-        //         }
-        //     }
-        //     move_on_board(&board,&move);
-        //     for(i=0;i<8;i++) input[i] = '\0';
-        // }else{
-        //     if(first_move==1){
-        //         move = random_move(&board,get_next_turn(&board));
-        //         // first_move = 0;
-        //     }else{
-        //         move = computer_move(&board,get_next_turn(&board));
-        //     }
-        //     for(i=0;i<8;i++) res[i] = '\0';
-        //     move_to_string(&move,res);
-        //     printf("%s",res);
-        //     fflush(stdout);
-        //     move_on_board(&board,&move);  
-        // }
-        // game_state = get_game_state(&board,White);
-        // printf("%d\n",game_state);
-        // fflush(stdout);
     }
     return 0;
 }
