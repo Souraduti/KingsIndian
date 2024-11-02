@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <string.h>
 
+
 /*
   Pieces Representation
   -ve values are used Black pieces
@@ -52,6 +53,7 @@ typedef enum Game_End_State{
            next 6 bit will store position of black king
            20th bit will be set if pawn has moved 2 Square
 */
+#define MAX_MOVES 256
 
 typedef char int8;
 typedef struct Board
@@ -59,6 +61,7 @@ typedef struct Board
     int8 brd[64];
     Turn turn;
     int flag;
+    long long int hash[MAX_MOVES];
     int move_number;
 }Board;
 
@@ -76,5 +79,7 @@ int get_pawn_jump(const Board *,Turn);
 void set_pawn_jump(Board * board,int file,Turn);
 int get_castling_right(const Board * board ,Turn,Castling_side);
 void set_castling_right(Board * board ,Turn turn,Castling_side,int);
+
+#include "zobrist.h"
 
 #endif

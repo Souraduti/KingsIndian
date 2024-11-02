@@ -32,65 +32,38 @@ int main()
     if(choice==3){
         choice = rand()%2+1;
     }
+    Turn player = choice==1?White:Black;
 
-    while (game_state==ON)
-    {
-        //white move 
+    while (game_state==0)
+    { 
+        Move move;
         move.mv = 0;
-        if(choice==1){
+        int depth;
+        if(board.move_number<=10){
+            depth = 3;
+        }else if(board.move_number<=60){
+            depth = 4;
+        }else{
+            depth = 5;
+        }
+        if(player==board.turn){
             while(move.mv==0){
-                move = user_input(&board,White);
+                move = user_input(&board,board.turn);
             }
             move_on_board(&board,&move);
-            system("cls");
-            display(&board);
-        }else if(choice==2){
-            start = clock();
+        }else{
             if(first_move==1){
-                move = random_move(&board,White);
+                move = random_move(&board,get_next_turn(&board));
                 first_move = 0;
             }else{
-                move = computer_move(&board,White);
+                move = computer_move(&board,get_next_turn(&board),depth);
             }
-            end = clock();
-            elapsed = (end-start)*1000/CLOCKS_PER_SEC;
-            total+=elapsed;
-            move_on_board(&board,&move);
-            system("cls");
-            display(&board);
             display_move(&move);
-            printf("Time : %0.3lf ms\n",elapsed);
+            move_on_board(&board,&move);  
         }
-        game_state = get_game_state(&board,Black);
-        if(game_state!=ON) break;
-        //Black move
-        move.mv = 0;
-        if(choice==1){
-            start = clock();
-            if(first_move==1){
-                move = random_move(&board,Black);
-                first_move = 0;
-            }else{
-                move = computer_move(&board,Black);
-            }
-            end = clock();
-            elapsed = (end-start)*1000/CLOCKS_PER_SEC;
-            total+=elapsed;
-            move_on_board(&board,&move);
-            system("cls");
-            display(&board);
-            display_move(&move);
-            printf("Time : %0.3lf ms\n",elapsed);
-        }else if (choice==2){
-            while(move.mv==0){
-                move = user_input(&board,Black);
-            }
-            move_on_board(&board,&move);
-            system("cls");
-            display(&board);
-        }
-        game_state = get_game_state(&board,White);
-        if(game_state!=ON) break;  
+        game_state = get_game_state(&board,get_next_turn(&board));
+        system("cls");
+        display(&board);
     }
     char * str;
     switch(game_state){

@@ -22,8 +22,8 @@ Movelist generate_all(Board * ,Movelist *,Turn,int filter);
 int in_check(const Board *,Turn);
 int is_checkmate(Board*,Turn);
 int is_stalemate(Board *,Turn);
-//int is_gameover(Board *,Turn);
 int is_insufficient(Board *board);
+int is_repitation(Board * board);
 Game_End_State get_game_state(Board *,Turn);
 
 #endif

@@ -31,7 +31,7 @@ int main(int argc,char ** argv)
     { 
         Move move;
         move.mv = 0;
-        int depth;
+        int depth = 5;
         if(board.move_number<=10){
             depth = 3;
         }else if(board.move_number<=60){

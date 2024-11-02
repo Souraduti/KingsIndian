@@ -137,6 +137,14 @@ int is_insufficient(Board *board){
     }
     return 0;
 }
+int is_repitation(Board * board){
+    int i,count = 0;
+    for(i = board->move_number-1;i>=0;i--){
+        if(board->hash[i]==board->hash[board->move_number]) count++;
+        if(count>=2)  return 1;
+    }
+    return 0;
+}
 Game_End_State get_game_state(Board * board,Turn turn){
     int cheked = in_check(board,turn);
     Movelist moves;
@@ -144,5 +152,6 @@ Game_End_State get_game_state(Board * board,Turn turn){
     if(moves.size==0&&cheked==0) return Draw_Stalemate;
     if(moves.size==0&&cheked==1) return turn==White?Black_Won:White_Won; 
     if(is_insufficient(board)==1) return Draw_Insufficient;
+    if(is_repitation(board)==1) return Draw_Repetition;
     return ON; 
 }

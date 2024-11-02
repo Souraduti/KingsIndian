@@ -4,6 +4,7 @@
 
 #include "board.h"
 #include "move.h"
+#include "zobrist.h"
 
 void move_on_board(Board *,Move*);
 void unmove_on_board(Board *,Move*);

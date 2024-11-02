@@ -1,9 +1,12 @@
 #include "board.h"
 
+
+
 /* sets the pieces on the board in initial configuration */
 void set_board(Board * board)
 {
     board->move_number = 0;
+    board->hash[0] =  compute_hash(board);
     board->brd[0] = Rook;
     board->brd[1] = Night;
     board->brd[2] = Bishop;
@@ -119,6 +122,7 @@ void set_board_fen(Board * board,const char * fen,char t){
         }
     }
     board->move_number = 0;
+    board->hash[0] =  compute_hash(board);
     set_castling_right(board,White,Short,1);
     set_castling_right(board,White,Long,1);
     set_castling_right(board,Black,Short,1);

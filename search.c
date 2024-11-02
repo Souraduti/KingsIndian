@@ -29,8 +29,10 @@ int evaluate(Board * board,Turn turn,int depth,int* legal,int alpha,int beta){
     if(depth==0){
         return static_eval(board);
     }
-    if(is_insufficient(board)){
-        // draw by insufficient material
+    if(is_insufficient(board)==1){
+        return 0;
+    }
+    if(is_repitation(board)==1){
         return 0;
     }
     int i,eval,best_eval,count=0;
