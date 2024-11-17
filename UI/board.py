@@ -182,13 +182,12 @@ class Board:
             return (sq[0],7-sq[1])
 
     def get_color(self,row,col):
-        pairity = 1 if self.player_side=='b' else 0
         sq = self.adjust_sq((row,col))
         p = self.piece_at(sq)
         if sq in self.last_move:
-            color = Board.Last_Move_White if (row + col+pairity) % 2 == 0 else Board.Last_Move_Black
+            color = Board.Last_Move_White if (row + col) % 2 == 0 else Board.Last_Move_Black
         else:
-            color = Board.WHITE if (row + col+pairity) % 2 == 0 else Board.BLACK
+            color = Board.WHITE if (row + col) % 2 == 0 else Board.BLACK
         if self.game_end==0 or p==None:
             return color
         if self.game_end == 1:
