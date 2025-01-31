@@ -16,6 +16,6 @@ class Piece:
     def load_images(SQUARE_SIZE):
         pieces = ['wp', 'wr', 'wn', 'wb', 'wq', 'wk', 'bp', 'br', 'bn', 'bb', 'bq', 'bk']
         for piece in pieces:
-            Piece.images[piece] = pygame.transform.scale(pygame.image.load(f'images/{piece}.png').convert_alpha(), (SQUARE_SIZE,SQUARE_SIZE))
+            Piece.images[piece] = pygame.transform.scale(pygame.image.load(f'E:/Git/KingsIndian/KingsIndian/UI/images/{piece}.png').convert_alpha(), (SQUARE_SIZE,SQUARE_SIZE))
     def get_image(piece_name):
         return Piece.images[piece_name]
