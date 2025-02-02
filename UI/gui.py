@@ -7,7 +7,7 @@ from board import Board
 
 WIDTH =  HEIGHT = 640
 SQUARE_SIZE = WIDTH // 8
-    
+ROOT_DIR = "E:\\Git\\KingsIndian\\KingsIndian"    
 
 def get_square_under_mouse(side):
     mouse_pos = pygame.mouse.get_pos()
@@ -15,12 +15,17 @@ def get_square_under_mouse(side):
     rank = 7 - (mouse_pos[1] // SQUARE_SIZE) if side == 'w' else (mouse_pos[1] // SQUARE_SIZE)
     return (rank,file)
 
-def main(process,side,fen,to_play):
+def main(process,side,fen,to_play,sound):
     pygame.init()
+    music = None
+    if sound:
+        pygame.mixer.init()
+        music = pygame.mixer.music
+
     WINDOW = pygame.display.set_mode((WIDTH, HEIGHT))
     pygame.display.set_caption("Chess")
     Piece.load_images(SQUARE_SIZE)
-    board = Board(SQUARE_SIZE,side,fen)
+    board = Board(SQUARE_SIZE,side,fen,music)
     run = True
     selected_square = None
     piece_dragged = None
@@ -70,14 +75,18 @@ def main(process,side,fen,to_play):
 
 if __name__ == "__main__":
     side = random.choice(['w','b'])
+    sound = False
     fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR"
     to_play = "w"
     if len(sys.argv)>=2:
-        side = sys.argv[1]
+        sound = sys.argv[1]=="s"
     if len(sys.argv)>=3:
-        fen = sys.argv[2]
+        side = sys.argv[2]
     if len(sys.argv)>=4:
-        to_play = sys.argv[3]
+        fen = sys.argv[3]
+    if len(sys.argv)>=5:
+        to_play = sys.argv[4]
+
     if side not in ['w','b']:
         print('Enter w for playing white')
         print('Enter b for playing black')
@@ -85,6 +94,6 @@ if __name__ == "__main__":
     try:
         path = 'E:\Git\KingsIndian\KingsIndian\main_gui'
         process = subprocess.Popen([path,side,fen,to_play], stdin=subprocess.PIPE,stdout=subprocess.PIPE, text=True)       
-        main(process,side,fen,to_play)
+        main(process,side,fen,to_play,sound)
     finally:
         process.terminate()

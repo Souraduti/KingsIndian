@@ -8,14 +8,16 @@ class Board:
     Last_Move_White = (108,108,108)
     Last_Move_Black = (128,128,128)
 
-    def __init__(self,SQ_SIZE,player_side,fen):
+    def __init__(self,SQ_SIZE,player_side,fen,sound):
         self.player_side = player_side
         self.pieces = []
         self.SQ_SIZE = SQ_SIZE
         self.game_end = 0
         self.last_move = [(-1,-1),(-1,-1)]
-        self.parse_fen(fen)
-        
+        self.parse_fen(fen) 
+        self.sound = sound
+
+
     def parse_fen(self,fen):
         ranks = fen.split("/")
         i = 7
@@ -34,10 +36,6 @@ class Board:
         else:
             c in ['k','q','r','b','n','p']
             return 'b'+c
-
-    # def display(self,win):
-    #     for piece in self.pieces:
-    #         piece.display(win,self.SQ_SIZE,self.player_side)
     def piece_at(self,position):
         rank,file = position
         for piece in self.pieces:
@@ -66,6 +64,7 @@ class Board:
         if src and dest:
             r1,f1 = src
             r2,f2 = dest
+        self.play_sound(self.get_piece(dest) != None)
         self.pieces = [ piece for piece in self.pieces if piece.rank != r2 or piece.file != f2 ]
         for piece in self.pieces:
             piece.last_moved = False 
@@ -113,6 +112,18 @@ class Board:
         if sq[1]<0 or sq[1]>=8:
             return False
         return True
+    
+    def play_sound(self,is_capture):
+        if self.sound == None:
+            return
+        root = "E:\\Git\\KingsIndian\\KingsIndian\\UI\\sound\\"
+        if is_capture:
+            self.sound.load(root+"capture.mp3")
+        else:
+            self.sound.load(root+"move.mp3")
+        self.sound.play()
+
+
     def move(self,src,dest,process,key):
         if self.game_end!=0:
             return False
@@ -126,10 +137,11 @@ class Board:
         s = self.move_to_string(src,dest)
         promotion = self.is_promotion(src,dest)
         en_passent = self.is_enpassent(src,dest)
+        
         if promotion:
             promotion = True
             if key not in ["q","r","b","n"]:
-                return False
+                key = "q"
             s+= key
         print(s)
         process.stdin.write(f"{s}\n")
@@ -175,6 +187,9 @@ class Board:
             self.game_end = int(state)
         except:
             self.game_end = 0
+        if self.game_end!=0:
+            self.sound.load("E:\\Git\\KingsIndian\\KingsIndian\\UI\\sound\\gameover.mp3")
+            self.sound.play()
     def adjust_sq(self,sq):
         if self.player_side == 'w':
             return (7-sq[0],sq[1])
