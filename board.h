@@ -80,6 +80,5 @@ void set_pawn_jump(Board * board,int file,Turn);
 int get_castling_right(const Board * board ,Turn,Castling_side);
 void set_castling_right(Board * board ,Turn turn,Castling_side,int);
 
-#include "zobrist.h"
 
 #endif

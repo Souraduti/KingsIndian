@@ -16,10 +16,10 @@
 int main(int argc,char ** argv)
 {
     int i;
-    int first_move = 1;
+    int first_random_move = 1;
     char input[8],res[8];
     Board board;
-    
+    char* initial_position = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR"; 
     time_t time_;
     srand((unsigned)time(&time_));
     int game_state=0;
@@ -27,6 +27,10 @@ int main(int argc,char ** argv)
     char * fen = argv[2];
     char t = argv[3][0];
     set_board_fen(&board,fen,t);
+    if(strcmp(fen,initial_position)!=0){
+        first_random_move = 0;
+    }
+
     while (game_state==0)
     { 
         Move move;
@@ -54,9 +58,9 @@ int main(int argc,char ** argv)
             for(i=0;i<8;i++) input[i] = '\0';
             move_on_board(&board,&move);
         }else{
-            if(first_move==1){
+            if(first_random_move==1){
                 move = random_move(&board,get_next_turn(&board));
-                first_move = 0;
+                first_random_move = 0;
             }else{
                 move = computer_move(&board,get_next_turn(&board),depth);
             }

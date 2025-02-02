@@ -1,5 +1,6 @@
 
 #include "move.h"
+#include "zobrist.h"
 
 int add_move(Movelist * movelist,Move move){
     if(movelist->size==LIST_LENGTH-1){
@@ -209,8 +210,8 @@ void move_to_string(const  Move * move,char *str_move){
         switch(get_promotion(move)){
             case 1:str_move[5] = 'q';break;
             case 2:str_move[5] = 'n';break;
-            case 4:str_move[5] = 'b';break;
-            case 8:str_move[5] = 'r';break;
+            case 4:str_move[5] = 'r';break;
+            case 8:str_move[5] = 'b';break;
         }
     }
     
