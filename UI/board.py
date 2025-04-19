@@ -187,7 +187,7 @@ class Board:
             self.game_end = int(state)
         except:
             self.game_end = 0
-        if self.game_end!=0:
+        if self.game_end!=0 and self.sound != None:
             self.sound.load("E:\\Git\\KingsIndian\\KingsIndian\\UI\\sound\\gameover.mp3")
             self.sound.play()
     def adjust_sq(self,sq):

@@ -92,7 +92,7 @@ if __name__ == "__main__":
         print('Enter b for playing black')
         sys.exit(1)
     try:
-        path = 'E:\Git\KingsIndian\KingsIndian\main_gui'
+        path = 'E:/Git/KingsIndian/KingsIndian/bin/gui_app'
         process = subprocess.Popen([path,side,fen,to_play], stdin=subprocess.PIPE,stdout=subprocess.PIPE, text=True)       
         main(process,side,fen,to_play,sound)
     finally:
