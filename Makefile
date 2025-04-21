@@ -17,8 +17,8 @@ CLI_OBJ = $(patsubst $(SRCDIR)/%.c, $(OBJDIR)/%.o, $(CLI_SRC))
 GUI_OBJ = $(patsubst $(SRCDIR)/%.c, $(OBJDIR)/%.o, $(GUI_SRC))
 
 # Targets
-CLI_TARGET = $(BINDIR)/cli_chess
-GUI_TARGET = $(BINDIR)/gui_chess
+CLI_TARGET = $(BINDIR)/cli_app
+GUI_TARGET = $(BINDIR)/gui_app
 
 # Compiler flags
 CFLAGS = -I$(INCDIR) -Wall -Wextra -std=c11
