@@ -24,6 +24,10 @@ def main(process,side,fen,to_play,sound):
 
     WINDOW = pygame.display.set_mode((WIDTH, HEIGHT))
     pygame.display.set_caption("Chess")
+    icon  = pygame.image.load(ROOT_DIR+"\\UI\\images\\game-icon.png")
+    pygame.display.set_icon(icon)
+
+
     Piece.load_images(SQUARE_SIZE)
     board = Board(SQUARE_SIZE,side,fen,music)
     run = True
